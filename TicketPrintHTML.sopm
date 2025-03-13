@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<otobo_package version="0.1">
+    <Name>TicketPrintHTML</Name>
+    <Version>11.0.0</Version>
+    <Framework>11.0.x</Framework>
+    <Vendor>Rother OSS GmbH</Vendor>
+    <URL>https://otobo.io/</URL>
+    <License>GNU GENERAL PUBLIC LICENSE Version 3, 29 June 2007</License>
+    <Description Lang="en">Print Tickets with advanced formatting, including images.</Description>
+    <Description Lang="de">Ticket Druck mit verbesserter Formatierung inklusive Bildern.</Description>
+    <Filelist>
+        <File Permission="660" Location="var/httpd/htdocs/skins/Agent/default/css/DynamicFieldDB.css" />
+		<File Permission="660" Location="var/httpd/htdocs/skins/Agent/default/css/Core.Reset.css" />
+		<File Permission="660" Location="var/httpd/htdocs/skins/Agent/default/css/Core.Default.css" />
+		<File Permission="660" Location="var/httpd/htdocs/skins/Agent/default/css/Core.Header.css" />
+		<File Permission="660" Location="var/httpd/htdocs/skins/Agent/default/css/Core.OverviewControl.css" />
+		<File Permission="660" Location="var/httpd/htdocs/skins/Agent/default/css/Core.OverviewSmall.css" />
+		<File Permission="660" Location="var/httpd/htdocs/skins/Agent/default/css/Core.OverviewMedium.css" />
+		<File Permission="660" Location="var/httpd/htdocs/skins/Agent/default/css/Core.OverviewLarge.css" />
+		<File Permission="660" Location="var/httpd/htdocs/skins/Agent/default/css/Core.Footer.css" />
+		<File Permission="660" Location="var/httpd/htdocs/skins/Agent/default/css/Core.PageLayout.css" />
+		<File Permission="660" Location="var/httpd/htdocs/skins/Agent/default/css/Core.Form.css" />
+		<File Permission="660" Location="var/httpd/htdocs/skins/Agent/default/css/Core.Table.css" />
+		<File Permission="660" Location="var/httpd/htdocs/skins/Agent/default/css/Core.Login.css" />
+		<File Permission="660" Location="var/httpd/htdocs/skins/Agent/default/css/Core.Widget.css" />
+		<File Permission="660" Location="var/httpd/htdocs/skins/Agent/default/css/Core.WidgetMenu.css" />
+		<File Permission="660" Location="var/httpd/htdocs/skins/Agent/default/css/Core.TicketDetail.css" />
+		<File Permission="660" Location="var/httpd/htdocs/skins/Agent/default/css/Core.Tooltip.css" />
+		<File Permission="660" Location="var/httpd/htdocs/skins/Agent/default/css/Core.Dialog.css" />
+		<File Permission="660" Location="var/httpd/htdocs/skins/Agent/default/css/Core.InputFields.css" />
+		<File Permission="660" Location="var/httpd/htdocs/skins/Agent/default/css/Core.Print.css" />
+		<File Permission="660" Location="var/httpd/htdocs/skins/Agent/default/css/Core.Animations.css" />
+		<File Permission="660" Location="var/httpd/htdocs/skins/Agent/default/css/Core.Icons.css" />
+		<File Permission="660" Location="var/httpd/htdocs/skins/Agent/default/css/Core.Agent.Daemon.css" />
+		<File Permission="660" Location="var/httpd/htdocs/skins/Agent/default/css/Core.Agent.CustomerUser.OpenTicket.css" />
+		<File Permission="660" Location="var/httpd/htdocs/skins/Agent/default/css/Agent.TicketPrintHTML.css" />
+		<File Permission="660" Location="var/httpd/htdocs/js/Agent.TicketPrintHTML.js" />
+		<File Permission="660" Location="Kernel/Config/Files/XML/Ticket.xml" />
+		<File Permission="660" Location="Kernel/Modules/AgentTicketPrint.pm" />
+		<File Permission="660" Location="Kernel/Output/HTML/Templates/Standard/AgentTicketPrint.tt"	/>
+	</Filelist>
+</otobo_package>

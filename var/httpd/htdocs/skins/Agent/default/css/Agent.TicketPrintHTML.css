@@ -1,0 +1,142 @@
+/* OTOBO is a web-based ticketing system for service organisations.
+
+Copyright (C) 2001-2020 OTRS AG, https://otrs.com/
+Copyright (C) 2019-2025 Rother OSS GmbH, https://otobo.io/
+
+This program is free software: you can redistribute it and/or modify it under
+the terms of the GNU General Public License as published by the Free Software
+Foundation, either version 3 of the License, or (at your option) any later version.
+This program is distributed in the hope that it will be useful, but WITHOUT
+ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+You should have received a copy of the GNU General Public License
+along with this program. If not, see <https://www.gnu.org/licenses/>.
+*/
+
+/**
+ * @package     AdvancedTicketPrint
+ * @section     Application
+ * @subsection  Ticket
+ */
+body {
+    background-color: white;
+    width: 775px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+#PDFLogo {
+    position: absolute;
+    height: 30px;
+    right: 12px;
+}
+
+#PDFLogo > img {
+    height: 100%;
+}
+
+div.TicketPrint {
+    padding-left: 20px;
+    padding-right: 20px;
+}
+
+div.TicketPrint #AttachmentWindow {
+    display: none;
+}
+
+div.TicketPrint h2 {
+    font-weight: bold;
+}
+
+div.TicketPrint .WidgetSimple {
+    padding-top: 5px;
+    padding-left: 5px;
+    border: 1px solid;
+    box-shadow: none;
+    break-inside: avoid;
+    margin-top: 15px;
+    margin-bottom: 15px;
+    box-decoration-break: slice;
+}
+
+div.TicketPrint #ArticleTableBody .Scroller,
+.TicketPrint .ArticleMailContent iframe {
+    height: unset;
+}
+
+div.TicketPrint.UseArticleColors #ArticleItems .ArticleMailContent iframe {
+    border: none;
+}
+
+.TicketPrint .WidgetSimple > .Header .WidgetAction,
+.TicketPrint .WidgetSimple > .Header .ControlRow,
+.TicketPrint div.Headline > div.Flag,
+.TicketPrint .Handle,
+.TicketPrint .ItemActions,
+.TicketPrint .WidgetSimple .ItemRow,
+.TicketPrint .WidgetSimple .ArticleMailContent > .Avatar,
+.TicketPrint .WidgetSimple .ArticleMailContentHTMLWrapper::before,
+.TicketPrint .WidgetSimple .ArticleMailContentHTMLWrapper::after,
+.TicketPrint .WidgetSimple .ArticleAttachments,
+.TicketPrint #WidgetTicket .DataTable th:last-of-type,
+.TicketPrint #WidgetTicket .DataTable td:last-of-type,
+.TicketPrint + #Footer {
+    display: none;
+}
+
+.TicketPrint .WidgetSimple a {
+    color: inherit;
+}
+
+.TicketPrint .WidgetSimple > .Header h2, 
+.TicketPrint .WidgetSimple > .Header h3 {
+    overflow-wrap: break-word;
+    overflow: visible;
+    white-space: normal;
+}
+
+.TicketPrint div.Headline > h1 {
+    margin-left: 0;
+}
+
+.TicketPrint table.DataTable thead,
+.TicketPrint table.DataTable thead th {
+    font-weight: bold;
+}
+
+.TicketPrint .TicketList #ArticleTable thead,
+.TicketPrint .TicketList #ArticleTable thead th,
+.TicketPrint .TicketList #ArticleTable tbody,
+.TicketPrint .TicketList #ArticleTable tbody tr td,
+.TicketPrint .TicketList #ArticleTable tbody tr,
+.TicketPrint .TicketList #ArticleTable thead:hover th,
+.TicketPrint .TicketList #ArticleTable tbody tr:hover td {
+    background-color: white !important;
+    border: 0.5px solid gray !important;
+    border-collapse: collapse !important;
+}
+
+.TicketPrint #ArticleItems .WidgetSimple .ArticleMailContentHTMLWrapper {
+    margin-left: 0px;
+    margin-right: 0px;
+}
+
+.TicketPrint .WidgetSimple .Content label {
+    font-weight: bold;
+    color: var(--colTextDark);
+}
+
+.TicketPrint #DynamicFieldsWidget .FieldContainer {
+    display: grid;
+    grid-template-columns: 100px 1fr;
+    column-gap: 10px;
+}
+
+.TicketPrint #DynamicFieldsWidget .FieldContainer label {
+    text-align: right;
+    grid-column: 1;
+}
+
+.TicketPrint #DynamicFieldsWidget .FieldContainer > p {
+    grid-column: 2;
+}
