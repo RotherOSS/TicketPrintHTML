@@ -28,16 +28,23 @@ Core.Agent = Core.Agent || {};
  */
 Core.Agent.TicketPrint = (function (TargetNS) {
 
+    var StartPrint;
+    
     /**
      * @name InitWidgets
-     * @memberof Core.Agent.TicketZoom
+     * @memberof Core.Agent.TicketPrint
      * @function
      * @param {Object} AsyncWidgetActions - list of widgets to initialize
      * @description
      *      This function initializes configured asynchronous widgets.
      */
     function InitWidgets(AsyncWidgetActions) {
+        let LoadedWidgets = 0;
+        let NoOfWidgets = Object.keys(AsyncWidgetActions).length;
         $.each(AsyncWidgetActions, function (ElementID, URLPart) {
+            if (StartPrint) {
+                clearTimeout(StartPrint);
+            }
             Core.AJAX.ContentUpdate($('#' + ElementID), Core.Config.Get('Baselink') + URLPart, function() {
 
                 // wait for content update
@@ -55,33 +62,30 @@ Core.Agent.TicketPrint = (function (TargetNS) {
                 });
 
                 $('#' + ElementID).find('.WidgetSimple').hide().fadeIn();
-                Core.UI.InitWidgetActionToggle();
+                LoadedWidgets++;
+                if (LoadedWidgets >= NoOfWidgets) {
+                    if (StartPrint) {
+                        clearTimeout(StartPrint);
+                    }
+                    StartPrint = setTimeout(print, 500);
+                }
             });
         });
     }
 
     /**
-     * @name IFrameResize
-     * @memberof Core.Agent.TicketPrint
-     * @function
-     * @param {Object} IFrame - the iframe element
-     * @description
-     *      This function resizes an iframe to it's content height.
-     */
-    /*TargetNS.IFrameResize = function (IFrame) {
-console.log("IFrameResize Called on " + typeof(IFrame));
-        IFrame.height = IFrame.contentWindow.document.body.scrollHeight + "px";
-    };*/
-
-    /**
      * @name IframeAutoHeight
-     * @memberof AdvancedTicketPrint.Agent.TicketPrint
+     * @memberof Core.Agent.TicketPrint
      * @function
      * @param {jQueryObject} $Iframe - The iframe which should be auto-heighted
      * @description
      *      Set iframe height automatically based on real content height.
      */
     TargetNS.IframeAutoHeight = function ($Iframe) {
+
+        if (StartPrint) {
+            clearTimeout(StartPrint);
+        }
 
         var NewHeight,
             IframeContentHeight
@@ -104,19 +108,18 @@ console.log("IFrameResize Called on " + typeof(IFrame));
                 NewHeight = IframeContentHeight + 5;
             }
 
-            // add delta for scrollbar
-            /*if (NewHeight > 0) {
-                NewHeight = parseInt(NewHeight, 10) + 25;
-            }*/
-
             $Iframe.height(NewHeight + 'px');
-            //console.log('NewHeight: ' + NewHeight);
-        }
+
+            }
+            if (StartPrint) {
+                clearTimeout(StartPrint);
+            }
+            StartPrint = setTimeout(print, 500);
     };
 
     /**
      * @name Init
-     * @memberof Core.Agent.TicketZoom
+     * @memberof Core.Agent.TicketPrint
      * @function
      * @description
      *      This function initializes the special module functions.
@@ -126,6 +129,12 @@ console.log("IFrameResize Called on " + typeof(IFrame));
         let AsyncWidgetActions = Core.Config.Get('AsyncWidgetActions') || {};
 
         InitWidgets(AsyncWidgetActions);
+
+        $('.TicketPrint #ArticleItems .WidgetMenu').remove();
+        $('.TicketPrint #ArticleItems .ArticleMailContent .Avatar').remove();
+        $('.TicketPrint #ArticleItems .ArticleMailContent .ItemActions').remove();
+
+        addEventListener('afterprint', close);
 
     };
     

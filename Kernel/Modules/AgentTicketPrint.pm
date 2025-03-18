@@ -33,7 +33,6 @@ use PDF::API2 ();
 # OTOBO modules
 use Kernel::System::VariableCheck qw(:all);
 use Kernel::Language              qw(Translatable);
-use Kernel::Modules::AdvancedTicketPrint;
 
 sub new {
     my ( $Type, %Param ) = @_;
@@ -48,6 +47,7 @@ sub new {
     my $ParamObject  = $Kernel::OM->Get('Kernel::System::Web::Request');
     
     $Self->{ArticleID} = $ParamObject->GetParam( Param => 'ArticleID' ) || '';
+    $Self->{ArticleSort} = $ParamObject->GetParam( Param => 'ZoomExpandSort' ) || '';
     
     return $Self;
 }
@@ -69,6 +69,8 @@ sub Run {
     # get needed objects
     my $TicketObject = $Kernel::OM->Get('Kernel::System::Ticket');
     my $ConfigObject = $Kernel::OM->Get('Kernel::Config');
+
+    $Self->{DisplaySettings} = $ConfigObject->Get('Ticket::Frontend::AgentTicketPrint');
 
     # check permissions
     my $Access = $TicketObject->TicketPermission(
@@ -133,12 +135,13 @@ sub Run {
         Value => $Self->{TicketID},
     );
 
-    if ($Self->{Subaction} && $Self->{Subaction} eq 'PrintAction') {
+    return $Self->_CreateHTMLContent(
+        TicketAttributes => \%Ticket,
+        AclAction => \%AclAction
+    );
 
-        return $Self->_CreateHTMLContent(
-            TicketAttributes => \%Ticket,
-            AclAction => \%AclAction
-        );
+=begin comment    
+    if ($Self->{Subaction} && $Self->{Subaction} eq 'PrintAction') {
 
     } else {
 
@@ -174,6 +177,8 @@ sub Run {
             Type        => 'inline',
         );
     }
+=end comment
+=cut
 
 }
 
@@ -314,8 +319,6 @@ sub _PrintPDF {
         . '/'
         . $ConfigObject->Get('ScriptAlias')
         . 'index.pl?Action=AgentTicketPrint;Subaction=PrintAction;TicketID=' . $Self->{TicketID};
-
-print STDERR 'Print URL: ' . $URL . "\n";
     
     my $ChromePath = $ConfigObject->Get('GoogleChrome::Bin');
     if ( !$ChromePath ) {
@@ -357,7 +360,6 @@ sub MaskAgentPrint {
 
     # get config object
     my $ConfigObject = $Kernel::OM->Get('Kernel::Config');
-
 
     my $Limit = $ConfigObject->Get('PDF::MaxPages');
     my $Order = $Self->{ArticleSort} eq 'reverse' ? 'DESC' : 'ASC';
@@ -1042,7 +1044,7 @@ sub _ArticleItem {
         TicketID               => $Ticket{TicketID},
         ArticleID              => $Article{ArticleID},
         UserID                 => $Self->{UserID},
-        ShowBrowserLinkMessage => 1,
+        ShowBrowserLinkMessage => 0,
         Type                   => $Param{Type},
         ShowDeletedArticles    => $Self->{ShowDeletedArticles}
     );

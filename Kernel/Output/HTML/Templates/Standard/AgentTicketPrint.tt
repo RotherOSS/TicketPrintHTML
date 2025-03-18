@@ -14,8 +14,11 @@
 # along with this program. If not, see <https://www.gnu.org/licenses/>.
 # --
 ## nofilter(TidyAll::Plugin::OTOBO::TT::ScriptUsage)
-
 [% RenderBlockStart("Header") %]
+<div class="PrintNotice">
+    <p>[% Translate("Preparing to print. Please wait.") | html %]</p>
+    <p>[% Translate("If there is no print dialog after a few seconds, please print this page manually via your browser.") | html %]</p>
+</div>
 <div id="PDFLogo">
     <img src="[% Data.PDFLogo | html %]">
 </div>

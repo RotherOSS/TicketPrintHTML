@@ -25,6 +25,22 @@ body {
     margin-right: auto;
 }
 
+@media print {
+    div.PrintNotice {
+        display: none;
+    }
+}
+
+div.PrintNotice {
+    text-align: center;
+    margin-bottom: 50px;
+    background-color: #c4cdfa;
+    background-color: var(--colNotifyOK);
+    padding: 12px;
+    width: 100%;
+    font-size: 1.5em;
+}
+
 #PDFLogo {
     position: absolute;
     height: 30px;

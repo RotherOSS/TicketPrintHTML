@@ -13274,7 +13274,7 @@ Thanks for your help!
             <Hash>
                 <Item Key="CSS">
                     <Array>
-                        <Item>Agent.AdvancedTicketPrint.css</Item>
+                        <Item>Agent.TicketPrintHTML.css</Item>
                     </Array>
                 </Item>
                 <Item Key="JavaScript">
