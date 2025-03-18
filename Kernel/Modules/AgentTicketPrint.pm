@@ -13,6 +13,11 @@
 # You should have received a copy of the GNU General Public License
 # along with this program. If not, see <https://www.gnu.org/licenses/>.
 # --
+# $origin: otobo - cb7519b61706979a7ebe46a54a9d710b64427662 - Kernel/Modules/AgentTicketPrint.pm
+# --
+
+# RotherOSS / TicketPrintHTML
+# Completely reqorked file, based on Kernel/Modules/AgentTicketZoom.pm
 
 package Kernel::Modules::AgentTicketPrint;
 
@@ -139,47 +144,6 @@ sub Run {
         TicketAttributes => \%Ticket,
         AclAction => \%AclAction
     );
-
-=begin comment    
-    if ($Self->{Subaction} && $Self->{Subaction} eq 'PrintAction') {
-
-    } else {
-
-        $Self->_PrintPDF();
-
-        # TODO: Error handling
-
-        # return the document as string
-        my $pdf = PDF::API2->open('var/tmp/output.pdf');
-        
-        my $PDFString = $pdf->stringify();
-        $pdf->end();
-
-        # Assemble file name.
-        my $DateTimeObject = $Kernel::OM->Create('Kernel::System::DateTime');
-
-        if ( $Self->{UserTimeZone} ) {
-            $DateTimeObject->ToTimeZone( TimeZone => $Self->{UserTimeZone} );
-        }
-        my $Filename = 'Ticket_' . $Ticket{TicketNumber} . '_';
-        $Filename .= $DateTimeObject->Format( Format => '%Y-%m-%d_%H:%M' );
-        $Filename .= '.pdf';
-
-        my $CleanedFilename = $Kernel::OM->Get('Kernel::System::Main')->FilenameCleanUp(
-            Filename => $Filename,
-            Type     => 'Attachment',
-        );
-
-        return $LayoutObject->Attachment(
-            Filename    => $CleanedFilename,
-            ContentType => "application/pdf",
-            Content     => $PDFString,
-            Type        => 'inline',
-        );
-    }
-=end comment
-=cut
-
 }
 
 sub _CreateHTMLContent {
@@ -303,32 +267,6 @@ sub _CreateHTMLContent {
         ),
         $LayoutObject->Footer;
 
-}
-
-sub _PrintPDF {
-    my ( $Self, %Param ) = @_;
-
-    my $ConfigObject = $Kernel::OM->Get('Kernel::Config');
-
-    # build URL
-    my $URL = $ConfigObject->Get('HttpType')
-        . '://'
-#        . $ConfigObject->Get('FQDN')
-#        . 'localhost'
-        . 'host.docker.internal'
-        . '/'
-        . $ConfigObject->Get('ScriptAlias')
-        . 'index.pl?Action=AgentTicketPrint;Subaction=PrintAction;TicketID=' . $Self->{TicketID};
-    
-    my $ChromePath = $ConfigObject->Get('GoogleChrome::Bin');
-    if ( !$ChromePath ) {
-        # TODO: add error message
-        return 0;
-    }
-    my $CommandResult = `cd var/tmp; '$ChromePath' --headless --print-to-pdf --virtual-time-budget=25000 --run-all-compositor-stages-before-draw '$URL' 2>&1`;
-
-    #TODO: log command output??
-    return $CommandResult;
 }
 
 sub MaskAgentPrint {

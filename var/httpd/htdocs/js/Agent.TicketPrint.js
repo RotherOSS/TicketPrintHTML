@@ -62,6 +62,8 @@ Core.Agent.TicketPrint = (function (TargetNS) {
                 });
 
                 $('#' + ElementID).find('.WidgetSimple').hide().fadeIn();
+
+                // make sure all widgets have finished loading before starting to print
                 LoadedWidgets++;
                 if (LoadedWidgets >= NoOfWidgets) {
                     if (StartPrint) {
@@ -83,6 +85,7 @@ Core.Agent.TicketPrint = (function (TargetNS) {
      */
     TargetNS.IframeAutoHeight = function ($Iframe) {
 
+        //don't print before resizing is finished
         if (StartPrint) {
             clearTimeout(StartPrint);
         }
@@ -91,9 +94,6 @@ Core.Agent.TicketPrint = (function (TargetNS) {
             IframeContentHeight
 
         if (isJQueryObject($Iframe)) {
-            // slightly change the width of the iframe to not be exactly 100% width anymore
-            // this prevents a double horizontal scrollbar (from iframe and surrounding div)
-            //$Iframe.width('calc(100%-2px)');
 
             let IframeContents = $Iframe.contents();
             if (IframeContents) {
@@ -111,6 +111,7 @@ Core.Agent.TicketPrint = (function (TargetNS) {
             $Iframe.height(NewHeight + 'px');
 
             }
+            //printing could have been started by a different event (e.g. widget loading) in the meantime!
             if (StartPrint) {
                 clearTimeout(StartPrint);
             }
