@@ -34,7 +34,7 @@
 		<File Permission="660" Location="var/httpd/htdocs/skins/Agent/default/css/Core.Agent.Daemon.css" />
 		<File Permission="660" Location="var/httpd/htdocs/skins/Agent/default/css/Core.Agent.CustomerUser.OpenTicket.css" />
 		<File Permission="660" Location="var/httpd/htdocs/skins/Agent/default/css/Agent.TicketPrintHTML.css" />
-		<File Permission="660" Location="var/httpd/htdocs/js/Agent.TicketPrintHTML.js" />
+		<File Permission="660" Location="var/httpd/htdocs/js/Agent.TicketPrint.js" />
 		<File Permission="660" Location="Kernel/Config/Files/XML/Ticket.xml" />
 		<File Permission="660" Location="Kernel/Modules/AgentTicketPrint.pm" />
 		<File Permission="660" Location="Kernel/Output/HTML/Templates/Standard/AgentTicketPrint.tt"	/>
