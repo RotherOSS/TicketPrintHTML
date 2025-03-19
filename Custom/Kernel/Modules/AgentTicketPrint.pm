@@ -17,7 +17,7 @@
 # --
 
 # RotherOSS / TicketPrintHTML
-# Completely reqorked file, based on Kernel/Modules/AgentTicketZoom.pm
+# Completely reworked file, based on Kernel/Modules/AgentTicketZoom.pm
 
 package Kernel::Modules::AgentTicketPrint;
 
@@ -33,7 +33,6 @@ use POSIX      qw(ceil);
 use File::stat qw(stat);
 
 # CPAN modules
-use PDF::API2 ();
 
 # OTOBO modules
 use Kernel::System::VariableCheck qw(:all);

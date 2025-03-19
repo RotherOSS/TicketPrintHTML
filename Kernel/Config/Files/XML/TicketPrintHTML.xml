@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="utf-8"?>
+<otobo_config version="2.0" init="Application">    
+    <Setting Name="Ticket::Frontend::AgentTicketPrint###DynamicFieldWidgetDisplay" UserPreferencesGroup="Advanced" UserModificationPossible="1" Required="0" Valid="1">
+        <Description Translatable="1">Display settings to override defaults for dynamic field widget for Tickets.</Description>
+        <Navigation>Frontend::Agent::View::TicketPrint</Navigation>
+        <Value>
+            <Hash>
+                <Item Key="NavBarName" Translatable="1">Dynamic Fields</Item>
+                <Item Key="WidgetTitle" Translatable="1">Dynamic Field Information</Item>
+            </Hash>
+        </Value>
+    </Setting>
+    <Setting Name="Ticket::Frontend::AgentTicketPrint###DynamicFieldWidgetDynamicFieldGroups" Required="0" Valid="0">
+        <Description Translatable="1">Dynamic fields groups for dynamic field widget. The key is the name of the group, the value contains the fields to be shown. Example: 'Key =&gt; My Group', 'Content: Name_X, NameY'.</Description>
+        <Navigation>Frontend::Agent::View::TicketPrint</Navigation>
+        <Value>
+            <Hash>
+            </Hash>
+        </Value>
+    </Setting>
+    <Setting Name="Ticket::Frontend::AgentTicketPrint###ShowArticleList" Required="0" Valid="0">
+        <Description Translatable="1">Whether or not a list of all articles is added when printing a ticket.</Description>
+        <Navigation>Frontend::Agent::View::TicketPrint</Navigation>
+        <Value>
+            <Item ValueType="Checkbox">1</Item>
+        </Value>
+    </Setting>
+    <Setting Name="Ticket::Frontend::AgentTicketPrint###PrintLogoFile" Required="1" Valid="1">
+        <Description Translatable="1">Specifies the path of the file for the logo in the page header (gif|jpg|png, 700 x 100 pixel).</Description>
+        <Navigation>Frontend::Agent::View::TicketPrint</Navigation>
+        <Value>
+            <Item ValueType="String" ValueRegex="">common/img/logo-otobo.png</Item>
+        </Value>
+    </Setting>
+    <Setting Name="Ticket::Frontend::AgentTicketPrint###Widgets###0100-TicketInformation" Required="0" Valid="1">
+        <Description Translatable="1">AgentTicketZoom widget that displays ticket data in the side bar.</Description>
+        <Navigation>Frontend::Agent::View::TicketZoom</Navigation>
+        <Value>
+            <Hash>
+                <Item Key="Module">Kernel::Output::HTML::TicketZoom::TicketInformation</Item>
+                <Item Key="Location">Sidebar</Item>
+            </Hash>
+        </Value>
+    </Setting>
+    <Setting Name="Ticket::Frontend::AgentTicketPrint###Widgets###0200-CustomerInformation" Required="0" Valid="1">
+        <Description Translatable="1">AgentTicketZoom widget that displays customer information for the ticket in the side bar.</Description>
+        <Navigation>Frontend::Agent::View::TicketZoom</Navigation>
+        <Value>
+            <Hash>
+                <Item Key="Module">Kernel::Output::HTML::TicketZoom::CustomerInformation</Item>
+                <Item Key="Location">Sidebar</Item>
+                <Item Key="Async">1</Item>
+            </Hash>
+        </Value>
+    </Setting>
+    <Setting Name="Loader::Module::AgentTicketPrint###001-Ticket" Required="0" Valid="1">
+        <Description Translatable="1">Loader module registration for the agent interface.</Description>
+        <Navigation>Frontend::Agent::ModuleRegistration::Loader</Navigation>
+        <Value>
+            <Hash>
+                <Item Key="CSS">
+                    <Array>
+                        <Item>Agent.TicketPrintHTML.css</Item>
+                    </Array>
+                </Item>
+                <Item Key="JavaScript">
+                    <Array>
+                        <Item>thirdparty/jquery-tablesorter-2.28.14/jquery.tablesorter.js</Item>
+                        <Item>Core.Agent.TicketSplit.js</Item>
+                        <Item>Core.UI.AllocationList.js</Item>
+                        <Item>Core.UI.Table.Sort.js</Item>
+                        <Item>Core.Agent.LinkObject.js</Item>
+                        <Item>Core.Agent.TableFilters.js</Item>
+                        <Item>Core.Agent.TicketFormDraft.js</Item>
+                        <Item>Core.Agent.ArticleFeatures.js</Item>
+                        <Item>Agent.TicketPrint.js</Item>
+                    </Array>
+                </Item>
+            </Hash>
+        </Value>
+    </Setting>
+</otobo_config>
