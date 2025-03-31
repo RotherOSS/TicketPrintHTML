@@ -29,6 +29,7 @@ Core.Agent = Core.Agent || {};
 Core.Agent.TicketPrint = (function (TargetNS) {
 
     var StartPrint;
+    var NoOfResizedIFrames = 0;
     
     /**
      * @name InitWidgets
@@ -110,12 +111,11 @@ Core.Agent.TicketPrint = (function (TargetNS) {
 
             $Iframe.height(NewHeight + 'px');
 
-            }
-            //printing could have been started by a different event (e.g. widget loading) in the meantime!
-            if (StartPrint) {
-                clearTimeout(StartPrint);
-            }
+            NoOfResizedIFrames++;
+        }
+        if (NoOfResizedIFrames >= $('iframe').length) {
             StartPrint = setTimeout(print, 500);
+        }
     };
 
     /**
@@ -135,7 +135,9 @@ Core.Agent.TicketPrint = (function (TargetNS) {
         $('.TicketPrint #ArticleItems .ArticleMailContent .Avatar').remove();
         $('.TicketPrint #ArticleItems .ArticleMailContent .ItemActions').remove();
 
-        addEventListener('afterprint', close);
+        addEventListener('afterprint', () => {
+            window.close();
+        });
 
     };
     

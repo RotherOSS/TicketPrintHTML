@@ -52,6 +52,9 @@ sub new {
     
     $Self->{ArticleID} = $ParamObject->GetParam( Param => 'ArticleID' ) || '';
     $Self->{ArticleSort} = $ParamObject->GetParam( Param => 'ZoomExpandSort' ) || '';
+    $Self->{VersionView}     = $ParamObject->GetParam( Param => 'VersionView' )     || '';
+    $Self->{SourceArticleID} = $ParamObject->GetParam( Param => 'SourceArticleID' ) || '';
+    $Self->{VersionID}       = $ParamObject->GetParam( Param => 'VersionID' )       || '';
     
     return $Self;
 }
@@ -1066,12 +1069,9 @@ sub _ArticleBoxGet {
 
 Returns article html.
 
-    my $HTML = $Self->_ArticleRender(
-        TicketID               => 123,      # (required)
-        ArticleID              => 123,      # (required)
-        Type                   => 'Static', # (required) Static or OnLoad
-        ShowBrowserLinkMessage => 1,        # (optional)
-    );
+Implementation based on 
+Kernel::Output::HTML::TicketZoom::Agent::MIMEBase->ArticleRender() and
+Kernel::Modules::AgentTicketArticleContent->Run()
 
 Result:
     $HTML = "<div>...</div>";
@@ -1092,22 +1092,217 @@ sub _ArticleRender {
         }
     }
 
+    my $LayoutObject = $Kernel::OM->Get('Kernel::Output::HTML::Layout');
+    my $ConfigObject         = $Kernel::OM->Get('Kernel::Config');
+    my $ArticleBaseObject = $Kernel::OM->Get('Kernel::Output::HTML::TicketZoom::Agent::Base');
+    my $LogObject    = $Kernel::OM->Get('Kernel::System::Log');
+    
+# First part is based on Kernel::Output::HTML::TicketZoom::Agent::MIMEBase->ArticleRender()
+
     # Get article data.
     my $ArticleBackendObject = $Kernel::OM->Get('Kernel::System::Ticket::Article')->BackendForArticle(%Param);
 
-    # Determine channel name for this Article.
-    my $ChannelName = $ArticleBackendObject->ChannelNameGet();
-
-    my $Loaded = $Kernel::OM->Get('Kernel::System::Main')->Require(
-        "Kernel::Output::HTML::TicketZoom::Agent::$ChannelName",
-    );
-    return if !$Loaded;
-
-    return $Kernel::OM->Get("Kernel::Output::HTML::TicketZoom::Agent::$ChannelName")->ArticleRender(
+    my %Article = $ArticleBackendObject->ArticleGet(
         %Param,
-        ArticleActions => $Param{MenuItems},
-        UserID         => $Self->{UserID},
+        RealNames => 1,
     );
+    if ( !%Article ) {
+        $Kernel::OM->Get('Kernel::System::Log')->Log(
+            Priority => 'error',
+            Message  => "Article not found (ArticleID=$Param{ArticleID})!"
+        );
+        return;
+    }
+
+    my $Access = $Kernel::OM->Get('Kernel::System::Ticket')->TicketPermission(
+        Type     => 'ro',
+        TicketID => $Article{TicketID},
+        UserID   => $Self->{UserID},
+    );
+    if ( !$Access ) {
+        return $LayoutObject->NoPermission( WithHeader => 'yes' );
+    }
+
+    # Get channel specific fields
+    my %ArticleFields = $LayoutObject->ArticleFields(%Param);
+
+    # Get dynamic fields and accounted time
+    my %ArticleMetaFields;
+
+    if ( !$Self->{VersionView} ) {
+        %ArticleMetaFields = $ArticleBaseObject->ArticleMetaFields(%Param);
+    }
+
+    # Get data from modules like Google CVE search
+    my @ArticleModuleMeta = $ArticleBaseObject->_ArticleModuleMeta(%Param);
+
+    # Show created by string, if creator is different from admin user.
+    if ( $Article{CreateBy} > 1 ) {
+        $Article{CreateByUser} = $Kernel::OM->Get('Kernel::System::User')->UserName( UserID => $Article{CreateBy} );
+    }
+
+    my %CommunicationChannel = $Kernel::OM->Get('Kernel::System::CommunicationChannel')->ChannelGet(
+        ChannelID => $Article{CommunicationChannelID},
+    );
+
+    if ( $CommunicationChannel{ChannelName} eq 'Email' ) {
+        my $TransmissionStatus = $ArticleBackendObject->ArticleTransmissionStatus(
+            ArticleID => $Article{ArticleID},
+        );
+        if ($TransmissionStatus) {
+            $LayoutObject->Block(
+                Name => 'TransmissionStatusMessage',
+                Data => $TransmissionStatus,
+            );
+        }
+    }
+
+    my %Flags = $Kernel::OM->Get('Kernel::System::Ticket::Article')->ArticleFlagGet(
+        ArticleID => $Article{ArticleID},
+        UserID    => 1,
+    );
+
+# Implementation based on Kernel::Modules::AgentTicketArticleContent from here on.
+
+    my $ShowDeletedArticles = $Kernel::OM->Get('Kernel::System::Ticket::ArticleFeatures')->ShowDeletedArticles(
+        TicketID  => $Article{TicketID},
+        UserID    => $Self->{UserID},
+        GetStatus => 1
+    );
+
+    my $DeletedVersionID = $ShowDeletedArticles ? $Param{DeletedVersionID} : 0;
+
+    my $ArticleStorage = $ConfigObject->Get('Ticket::Article::Backend::MIMEBase::ArticleStorage');
+
+    my $ArticleContent = $LayoutObject->ArticlePreview(
+        ArticleID           => $Article{ArticleID},
+        TicketID            => $Article{TicketID},
+        ShowDeletedArticles => $ShowDeletedArticles ? 1 : 0,
+        VersionView         => $Self->{VersionView},
+        DeletedVersionID    => $DeletedVersionID, 
+        ArticleStorage      => $ArticleStorage,
+        SourceArticleID     => $Self->{SourceArticleID}
+    );
+
+    if ( !$ArticleContent ) {
+        $LogObject->Log(
+            Message  => 'No such article!',
+            Priority => 'error',
+        );
+
+        return $LayoutObject->ErrorScreen();
+    }
+
+    # generate base url
+    my $URL;
+
+    if ( !$Self->{VersionView} && !$DeletedVersionID ) {
+        $URL = 'Action=AgentTicketAttachment;Subaction=HTMLView'
+            . ";TicketID=$Article{TicketID};ArticleID=$Article{ArticleID};FileID=";
+    }
+    elsif ( $Self->{VersionView} && !$DeletedVersionID ) {
+        $URL = 'Action=AgentTicketAttachment;Subaction=HTMLView'
+            . ";TicketID=$Article{TicketID};ArticleID=$Article{ArticleID};VersionView=1;SourceArticleID=$Self->{SourceArticleID};FileID=";
+    }
+    else {
+        $URL = 'Action=AgentTicketAttachment;Subaction=HTMLView'
+            . ";TicketID=$Article{TicketID};ArticleID=$Article{ArticleID};VersionView=0;SourceArticleID=$DeletedVersionID;ArticleDeleted=$DeletedVersionID;FileID=";
+    }
+
+    # replace links to inline images in html content
+    my %AtmBox;
+
+    if ( !$DeletedVersionID ) {
+        %AtmBox = $ArticleBackendObject->ArticleAttachmentIndex(
+            ArticleID       => $Article{ArticleID},
+            SourceArticleID => $Self->{SourceArticleID}, 
+            VersionView     => $Self->{VersionView} || ''
+        );
+    }
+    else {
+        %AtmBox = $ArticleBackendObject->ArticleAttachmentIndex(
+            ArticleID       => $Article{ArticleID},
+            SourceArticleID => $DeletedVersionID,
+            ArticleDeleted  => 1,
+            VersionView     => 1
+        );
+    }
+
+    # Do not load external images if 'BlockLoadingRemoteContent' is enabled.
+    my $LoadExternalImages = 1;
+    if ( $ConfigObject->Get('Ticket::Frontend::BlockLoadingRemoteContent') ) {
+        $LoadExternalImages = 0;
+    }
+
+    my $SenderInitials  = $LayoutObject->UserInitialsGet(
+        Fullname => $Article{FromRealname},
+    );
+
+    my $SenderImage => $Kernel::OM->Get('Kernel::Output::HTML::TicketZoom::Agent::Base')->_ArticleSenderImage(
+        Sender => $Article{From},
+        UserID => $Self->{UserID},
+    );
+
+    my %Data = (
+        Content            => $ArticleContent,
+        ContentAlternative => '',
+        ContentID          => '',
+        ContentType        => 'text/html; charset="utf-8"',
+        Disposition        => 'inline',
+    );
+
+    # reformat rich text document to have correct charset and links to
+    # inline documents
+    %Data = $LayoutObject->RichTextDocumentServe(
+        Data               => \%Data,
+        URL                => $URL,
+        Attachments        => \%AtmBox,
+        LoadExternalImages => $LoadExternalImages,
+    );
+
+    # if there is unexpectedly pgp decrypted content in the html email (OE),
+    # we will use the article body (plain text) from the database as fall back
+    # see bug#9672
+    if (
+        $Data{Content} =~ m{
+        ^ .* -----BEGIN [ ] PGP [ ] MESSAGE-----  .* $      # grep PGP begin tag
+        .+                                                  # PGP parts may be nested in html
+        ^ .* -----END [ ] PGP [ ] MESSAGE-----  .* $        # grep PGP end tag
+    }xms
+        )
+    {
+
+        # html quoting
+        $Article{Body} = $LayoutObject->Ascii2Html(
+            NewLine        => $ConfigObject->Get('DefaultViewNewLine'),
+            Text           => $Article{Body},
+            VMax           => $ConfigObject->Get('DefaultViewLines') || 5000,
+            HTMLResultMode => 1,
+            LinkFeature    => 1,
+        );
+
+        # use the article body as content, because pgp was definitly descrypted if possible
+        $Data{Content} = $Article{Body};
+    }
+
+    $ArticleContent = $Data{Content};
+
+    return $LayoutObject->Output(
+        TemplateFile => 'AgentTicketPrint/MIMEBase',
+        Data         => {
+            %Article,
+            VersionView => $Self->{VersionView},
+            VersionID => $Self->{VersionID},
+            ArticleFields => \%ArticleFields,
+            CommunicationChannel => $CommunicationChannel{DisplayName},
+            Crypt => \%Flags,
+            ArticleMetaFields => \%ArticleMetaFields,
+            SenderImage => $SenderImage,
+            SenderInitials => $SenderInitials,
+            HTML => $ArticleContent,
+            ArticleModuleMeta => \@ArticleModuleMeta
+        },
+    )
 }
 
 sub _GetIncludedFieldOrdered {

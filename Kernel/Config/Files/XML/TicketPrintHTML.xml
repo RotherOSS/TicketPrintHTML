@@ -61,6 +61,8 @@
                 <Item Key="CSS">
                     <Array>
                         <Item>Agent.TicketPrintHTML.css</Item>
+                        <Item>RichTextArticleContent.css</Item>
+                        <Item>common/css/ckeditor5-44.1.0-content.css</Item>
                     </Array>
                 </Item>
                 <Item Key="JavaScript">

@@ -19,24 +19,21 @@
     <p>[% Translate("Preparing to print. Please wait.") | html %]</p>
     <p>[% Translate("If there is no print dialog after a few seconds, please print this page manually via your browser.") | html %]</p>
 </div>
-<div id="PDFLogo">
-    <img src="[% Data.PDFLogo | html %]">
-</div>
 <div class="ARIARoleMain TicketPrint UseArticleColors">
     <div class="ClearLeft"></div>
     <div class="Headline NoMargin">
         <div class="Flag" title="[% Translate(Data.Priority) | html %]"><span class="PriorityID-[% Data.PriorityID | html %]">[% Translate(Data.Priority) | html %]</span></div>
         <h1>
-            [% Data.Hook %][% Config('Ticket::HookDivider') %][% Data.TicketNumber | html %] &mdash; [% Data.Title | html %]
+            [% IF Data.ArticleCount == 1 %]
+                [% Data.Hook %][% Config('Ticket::HookDivider') %][% Data.TicketNumber | html %] &mdash; <br />[% Data.Title | html %]
+            [% ELSE %]
+                [% Data.Hook %][% Config('Ticket::HookDivider') %][% Data.TicketNumber | html %]
+            [% END %]
         </h1>
+        <div id="PDFLogo">
+            <img src="[% Data.PDFLogo | html %]">
+        </div>
     </div>
-
-# Iframe used for fixing bug#8545: Attachment download not possible if pop up of another action is open
-# All downloads (e.g. attachments) have this iframe as target. This prevents the browser from sending
-# an http request to the TicketZoom window. It sends the download request to this iframe instead.
-# Sending the download request to the main window would lead to an alert message about leaving the page
-# if at the same time a popup window (e.g. for a ticket answer) is opened.
-    <iframe src="about:blank" width="0" height="0" name="AttachmentWindow" id="AttachmentWindow"></iframe>
 
     <div>
         <div class="SidebarWidgets">

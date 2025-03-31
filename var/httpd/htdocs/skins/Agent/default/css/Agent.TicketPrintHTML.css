@@ -29,6 +29,17 @@ body {
     div.PrintNotice {
         display: none;
     }
+
+    div {
+        /*-webkit-box-decoration-break: slice;
+        box-decoration-break: slice;*/
+    }
+
+    iframe {
+        page-break-inside: auto;
+        page-break-before: always;
+        page-break-after: always;
+    }
 }
 
 div.PrintNotice {
@@ -39,12 +50,28 @@ div.PrintNotice {
     padding: 12px;
     width: 100%;
     font-size: 1.5em;
+    box-sizing: border-box;
+}
+
+div.TicketPrint .Headline {
+    display: flex;
+    flex-direction: row;
+    height: fit-content;
+    align-items: end;
+}
+
+div.TicketPrint div.Headline > h1 {
+    margin: 0;
+    line-height: 1.5em;
+    white-space: normal;
+    overflow: visible;
+    font-weight: bold;
+    flex-grow: 1;
 }
 
 #PDFLogo {
-    position: absolute;
     height: 30px;
-    right: 12px;
+    margin-left: 12px;
 }
 
 #PDFLogo > img {
@@ -56,10 +83,6 @@ div.TicketPrint {
     padding-right: 20px;
 }
 
-div.TicketPrint #AttachmentWindow {
-    display: none;
-}
-
 div.TicketPrint h2 {
     font-weight: bold;
 }
@@ -69,10 +92,8 @@ div.TicketPrint .WidgetSimple {
     padding-left: 5px;
     border: 1px solid;
     box-shadow: none;
-    break-inside: avoid;
     margin-top: 15px;
     margin-bottom: 15px;
-    box-decoration-break: slice;
 }
 
 div.TicketPrint #ArticleTableBody .Scroller,

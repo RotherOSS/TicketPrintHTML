@@ -139,7 +139,7 @@
                 [% PROCESS ArticleActionMenu.tt %]
 
 [% IF Data.HTML %]
-                <div class="ArticleMailContentHTMLWrapper">
+<div class="ArticleMailContentHTMLWrapper">
 # execute IFrame JS asynchronously. Otherwise it could happen before our API was loaded
 # the following JS code must be within the template, otherwise it could happen, that also this code itself is not loaded yet
 <script>
@@ -182,7 +182,7 @@ function CheckIFrameHeight(IFrameID) {
                     // the wrong iframe content being displayed (see https://bugzilla.mozilla.org/show_bug.cgi?id=356558)
                     document.getElementById('Iframe[% Data.ArticleID | html %]').contentWindow.location.href = document.getElementById('Iframe[% Data.ArticleID | html %]').src
                     </script>
-                </div>
+</div>
 [% ELSE %]
 [% Data.BodyNote %]
                 <div class="ArticleBody">
