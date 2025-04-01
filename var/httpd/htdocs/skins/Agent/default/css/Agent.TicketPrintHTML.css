@@ -19,7 +19,7 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
  * @subsection  Ticket
  */
 body {
-    background-color: white;
+    background-color: white !important;
     width: 775px;
     margin-left: auto;
     margin-right: auto;

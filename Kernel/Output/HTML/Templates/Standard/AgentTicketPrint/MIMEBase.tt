@@ -31,12 +31,16 @@
         </div>
 
         <div class="Content">
-
-            <div class="ArticleMailContent">
+            <template shadowrootmode="closed">
                 [% IF Data.HTML %]
-                    [% Data.HTML %]
+                    <style>
+                        [% Data.Styles %]
+                    </style>
+                    <div class="ck-content">
+                        [% Data.HTML %]
+                    </div>
                 [% END %]
-            </div>
+            </template>
         </div>
     </div>
 </div>

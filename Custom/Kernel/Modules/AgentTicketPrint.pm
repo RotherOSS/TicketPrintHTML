@@ -1281,11 +1281,19 @@ sub _ArticleRender {
             LinkFeature    => 1,
         );
 
-        # use the article body as content, because pgp was definitly descrypted if possible
+        # use the article body as content, because pgp was definitly decrypted if possible
         $Data{Content} = $Article{Body};
     }
 
     $ArticleContent = $Data{Content};
+
+    # extract styles from articles
+    my @styles;
+    $ArticleContent =~ s/(<style[^<>]*>)(.*?)(<\/style>)/push @styles, [$1, $2, $3]; ""/gse;
+    my $CombinedStyles = join("\n", map { $_->[1] } @styles);
+
+    #remove meta tag
+    $ArticleContent =~ s/<meta[^<>]*>//gse;
 
     return $LayoutObject->Output(
         TemplateFile => 'AgentTicketPrint/MIMEBase',
@@ -1300,6 +1308,7 @@ sub _ArticleRender {
             SenderImage => $SenderImage,
             SenderInitials => $SenderInitials,
             HTML => $ArticleContent,
+            Styles => $CombinedStyles,
             ArticleModuleMeta => \@ArticleModuleMeta
         },
     )
