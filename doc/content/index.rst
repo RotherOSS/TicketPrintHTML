@@ -1,0 +1,94 @@
+.. toctree::
+    :maxdepth: 2
+    :caption: Contents
+
+Sacrifice to Sphinx
+===================
+
+Overview
+========
+.. This is the start of the documentation and aimed in part at a non technical audience.
+   Keep your sentences short. This aides in understanding as well as translation. 
+
+Summary
+-------
+.. A very short description of the package, about 1 or 2 sentences. This can be the same info that is visible in the OTOBO package manager. 
+
+Print Tickets with advanced formatting, including images.
+
+Usage
+------------
+
+Following installation, this package is active and usable right away.
+
+Tickets and their articles are now printed in their original styling. This especially includes content such as inline images.
+
+These are the most notable options for configuring how Tickets are printed:
+
+- Printing a list of all articles in the ticket: :ref:`Ticket::Frontend::AgentTicketPrint###ShowArticleList`
+
+- Adding the logo to be printed at the top of the page: :ref:`Ticket::Frontend::AgentTicketPrint###PrintLogoFile`
+
+A complete list of options can be found in the :ref:`Ticket::Frontend::AgentTicketPrint###Configuration Reference`
+
+System requirements
+-------------------
+
+Framework
+^^^^^^^^^
+.. What version of OTOBO was this package developed for?
+
+OTOBO 11.0.x
+
+Packages
+^^^^^^^^
+.. Which packages does this one depend on? Only list direct dependencies. Keep in mind that order can be important and include version numbers.
+
+.. Package Name x.x.x
+
+Third-party software
+^^^^^^^^^^^^^^^^^^^^
+\-
+
+Configuration Reference
+-----------------------
+
+Frontend::Agent::View::TicketPrint
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Ticket::Frontend::AgentTicketPrint###ShowArticleList
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+Whether or not a list of all articles is added when printing a ticket.
+
+Ticket::Frontend::AgentTicketPrint###PrintLogoFile
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+Specifies the file for the logo in the page header encoded to base64 (700 x 100 pixel).
+
+Ticket::Frontend::AgentTicketPrint###DynamicFieldWidgetDisplay
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+Display settings to override defaults for dynamic field widget for Tickets.
+
+Ticket::Frontend::AgentTicketPrint###DynamicFieldWidgetDynamicFieldGroups
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+Dynamic fields groups for dynamic field widget. The key is the name of the group, the value contains the fields to be shown. Example: 'Key => My Group', 'Content: Name_X, NameY'.
+
+Ticket::Frontend::AgentTicketPrint###Widgets###0200-CustomerInformation
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+Printing information usually visible in the Customer Information Widget for the Zoom View side bar.
+
+Ticket::Frontend::AgentTicketPrint###Widgets###0100-TicketInformation
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+Printing information usually visible in the Ticket Information Widget for the Zoom View side bar.
+
+About
+=======
+
+Contact
+-------
+| Rother OSS GmbH
+| Email: hello@otobo.io
+| Web: https://otobo.io
+
+Version
+-------
+Author: |doc-vendor| / Version: |doc-version| / Date of release: |doc-datestamp|
