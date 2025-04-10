@@ -12,7 +12,7 @@
 		<File Permission="660" Location="Kernel/Config/Files/XML/TicketPrintHTML.xml" />
 		<File Permission="660" Location="Custom/Kernel/Modules/AgentTicketPrint.pm" />
 		<File Permission="660" Location="Kernel/Output/HTML/Templates/Standard/AgentTicketPrint.tt"	/>
-		<File Permission="660" Location="/Kernel/Output/HTML/Templates/Standard/AgentTicketPrint/MIMEBase.tt" />
-		<File Permission="660" Location="/Kernel/Output/HTML/Templates/Standard/AgentTicketPrint/PrintStyles.tt" />
+		<File Permission="660" Location="Kernel/Output/HTML/Templates/Standard/AgentTicketPrint/MIMEBase.tt" />
+		<File Permission="660" Location="Kernel/Output/HTML/Templates/Standard/AgentTicketPrint/PrintStyles.tt" />
 	</Filelist>
 </otobo_package>
