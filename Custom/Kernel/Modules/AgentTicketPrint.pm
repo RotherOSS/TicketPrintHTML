@@ -33,6 +33,7 @@ use POSIX      qw(ceil);
 use File::stat qw(stat);
 
 # CPAN modules
+use PDF::API2 qw(open);
 
 # OTOBO modules
 use Kernel::System::VariableCheck qw(:all);
@@ -74,8 +75,12 @@ sub Run {
     }
 
     # get needed objects
-    my $TicketObject = $Kernel::OM->Get('Kernel::System::Ticket');
-    my $ConfigObject = $Kernel::OM->Get('Kernel::Config');
+    my $TicketObject    = $Kernel::OM->Get('Kernel::System::Ticket');
+    my $ConfigObject    = $Kernel::OM->Get('Kernel::Config');
+    my $DateTimeObject  = $Kernel::OM->Create('Kernel::System::DateTime');
+    my $MainObject      = $Kernel::OM->Get('Kernel::System::Main');
+    my $FileTempObject = $Kernel::OM->Get('Kernel::System::FileTemp');
+    
 
     $Self->{DisplaySettings} = $ConfigObject->Get('Ticket::Frontend::AgentTicketPrint');
 
@@ -142,9 +147,64 @@ sub Run {
         Value => $Self->{TicketID},
     );
 
-    return $Self->_CreateHTMLContent(
+    my $HTML = $Self->_CreateHTMLContent(
         TicketAttributes => \%Ticket,
         AclAction => \%AclAction
+    );
+
+    my $HTMLFileDirectory = $FileTempObject->TempDir();
+
+    my ($FileHandle, $HTMLFilePath) = $FileTempObject->TempFile(
+        Suffix => '.html',
+    );
+    close($FileHandle);
+    
+    $MainObject->FileWrite(
+        Location    => $HTMLFilePath,
+        Content     => \$HTML,
+    );
+
+    my $PDFFilePath = $Self->_PrintPDF(
+        FileTempObject   => $FileTempObject,
+        HTMLFilePath     => $HTMLFilePath,
+    );
+
+    # check if file exists
+    if ( !-e $PDFFilePath ) {
+        $Kernel::OM->Get('Kernel::System::Log')->Log(
+            Priority => 'error',
+            Message  => "PDF file '$PDFFilePath' does not exist!",
+        );
+        return $LayoutObject->ErrorScreen(
+            Message => Translatable('PDF cannot be generated!'),
+            Comment => Translatable('Please contact the administrator.'),
+        );
+    }
+
+    # return the document as string
+    my $pdf = PDF::API2->open($PDFFilePath);
+    
+    my $PDFString = $pdf->stringify();
+    $pdf->end();
+
+    # assemble filename
+    if ( $Self->{UserTimeZone} ) {
+        $DateTimeObject->ToTimeZone( TimeZone => $Self->{UserTimeZone} );
+    }
+    my $Filename = 'Ticket_' . $Ticket{TicketNumber} . '_';
+    $Filename .= $DateTimeObject->Format( Format => '%Y-%m-%d_%H_%M' );
+    $Filename .= '.pdf';
+
+    my $CleanedFilename = $Kernel::OM->Get('Kernel::System::Main')->FilenameCleanUp(
+        Filename => $Filename,
+        Type     => 'Attachment',
+    );
+
+    return $LayoutObject->Attachment(
+        Filename    => $CleanedFilename,
+        ContentType => "application/pdf",
+        Content     => $PDFString,
+        Type        => 'inline',
     );
 }
 
@@ -183,91 +243,15 @@ sub _CreateHTMLContent {
     my $ParamObject = $Kernel::OM->Get('Kernel::System::Web::Request');
     my $MainObject  = $Kernel::OM->Get('Kernel::System::Main');
 
-    if ( $Self->{Subaction} eq 'LoadWidget' ) {
-        my $ElementID = $ParamObject->GetParam( Param => 'ElementID' );
-        my $Config;
-        WIDGET:
-        for my $Key ( sort keys %{ $Self->{DisplaySettings}->{Widgets} // {} } ) {
-            if ( $ElementID eq 'Async_' . $LayoutObject->LinkEncode($Key) ) {
-                $Config = $Self->{DisplaySettings}->{Widgets}->{$Key};
-                last WIDGET;
-            }
-        }
-        if ($Config) {
-            my $Success = eval { $MainObject->Require( $Config->{Module} ) };
-            if ( !$Success ) {
-                $Kernel::OM->Get('Kernel::System::Log')->Log(
-                    Priority => 'error',
-                    Message  => "Cannot load $Config->{Module}: $@",
-                );
-                return $LayoutObject->Attachment(
-                    ContentType => 'text/html',
-                    Content     => '',
-                    Type        => 'inline',
-                    NoCache     => 1,
-                );
-            }
-            my $Module = eval { $Config->{Module}->new( %{$Self} ) };
-            if ( !$Module ) {
-                $Kernel::OM->Get('Kernel::System::Log')->Log(
-                    Priority => 'error',
-                    Message  => "new() of Widget module $Config->{Module} not successful!",
-
-                );
-                return $LayoutObject->Attachment(
-                    ContentType => 'text/html',
-                    Content     => '',
-                    Type        => 'inline',
-                    NoCache     => 1,
-                );
-            }
-            my $WidgetOutput = $Module->Run(
-                Ticket    => \%Ticket,
-                AclAction => \%AclAction,
-                Config    => $Config,
-            );
-
-            return $LayoutObject->Attachment(
-                ContentType => 'text/html',
-                Content     => $WidgetOutput->{Output} // ' ',
-                Type        => 'inline',
-                NoCache     => 1,
-                Charset     => 'utf-8',
-            );
-        }
-        else {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
-                Priority => 'error',
-                Message  => "Cannot locate module for ElementID $ElementID",
-            );
-            return $LayoutObject->Attachment(
-                ContentType => 'text/html',
-                Content     => '',
-                Type        => 'inline',
-                NoCache     => 1,
-            );
-        }
-    }
-
     # get needed objects
     my $UserObject    = $Kernel::OM->Get('Kernel::System::User');
     my $SessionObject = $Kernel::OM->Get('Kernel::System::AuthSession');
 
     # generate output
-    return join '',
-        $LayoutObject->Header(
-            Value               => $Ticket{TicketNumber},
-            TicketID            => $Ticket{TicketID},
-            ShowToolbarItems    => 0,
-            ShowPrefLink        => 0,
-            ShowLogoutButton    => 0,
-            Type                => 'Small',
-        ),
-        $Self->MaskAgentPrint(
-            Ticket    => \%Ticket,
-            AclAction => \%AclAction
-        ),
-        $LayoutObject->Footer;
+    return  $Self->MaskAgentPrint(
+        Ticket    => \%Ticket,
+        AclAction => \%AclAction
+    );
 
 }
 
@@ -368,31 +352,10 @@ sub MaskAgentPrint {
     my $MainObject = $Kernel::OM->Get('Kernel::System::Main');
 
     my %Widgets;
-    my %AsyncWidgetActions;
     WIDGET:
     for my $Key ( sort keys %{ $Self->{DisplaySettings}->{Widgets} // {} } ) {
         my $Config = $Self->{DisplaySettings}->{Widgets}->{$Key};
 
-        if ( $Config->{Async} ) {
-            if ( !$Config->{Location} ) {
-                $Kernel::OM->Get('Kernel::System::Log')->Log(
-                    Priority => 'error',
-                    Message  =>
-                        "The configuration for $Config->{Module} must contain a Location, because it is marked as Async.",
-                );
-                next WIDGET;
-            }
-            my $ElementID = 'Async_' . $LayoutObject->LinkEncode($Key);
-            push @{ $Widgets{ $Config->{Location} } }, {
-                Async => 1,
-                Rank  => $Config->{Rank} || $Key,
-                %Ticket,
-                ElementID => $ElementID,
-            };
-            $AsyncWidgetActions{$ElementID} = "Action=$Self->{Action};Subaction=LoadWidget;"
-                . "TicketID=$Self->{TicketID};ElementID=$ElementID";
-            next WIDGET;
-        }
         my $Success = eval { $MainObject->Require( $Config->{Module} ) };
 
         next WIDGET unless $Success;
@@ -425,10 +388,6 @@ sub MaskAgentPrint {
             sort { $a->{Rank} cmp $b->{Rank} } @{ $Widgets{$Location} }
         ];
     }
-    $LayoutObject->AddJSData(
-        Key   => 'AsyncWidgetActions',
-        Value => \%AsyncWidgetActions,
-    );
 
     # set display options
     $Param{Hook} = $ConfigObject->Get('Ticket::Hook') || 'Ticket#';
@@ -509,8 +468,8 @@ sub MaskAgentPrint {
 
     # print logo
     $Param{PDFLogo} = '';
-    if ( $Self->{DisplaySettings}{PrintLogoFile} && $ConfigObject->Get('Frontend::WebPath')) {
-        $Param{PDFLogo} = $ConfigObject->Get('Frontend::WebPath') . $Self->{DisplaySettings}{PrintLogoFile};
+    if ( $Self->{DisplaySettings}{PrintLogoFile} ) {
+        $Param{PDFLogo} = $Self->{DisplaySettings}{PrintLogoFile};
     }
 
     $LayoutObject->Block(
@@ -792,8 +751,6 @@ sub _ArticleTree {
 
     # get layout object
     my $LayoutObject = $Kernel::OM->Get('Kernel::Output::HTML::Layout');
-
-
 
     # build thread string
     $LayoutObject->Block(
@@ -1243,21 +1200,84 @@ sub _ArticleRender {
         UserID => $Self->{UserID},
     );
 
+    $ArticleContent =~ s{
+        (=|"|')cid:(.*?)("|'|>|\/>|\s)
+    }
+    {
+        my $Start= $1;
+        my $ContentID = $2;
+        my $End = $3;
+        my $Content = '';
+
+        # improve html quality
+        if ( $Start ne '"' && $Start ne '\'' ) {
+            $Start .= '"';
+        }
+        if ( $End ne '"' && $End ne '\'' ) {
+            $End = '"' . $End;
+        }
+
+        # find matching attachment and replace it with base64 of image
+        ATTACHMENT_ID:
+        for my $AttachmentID ( sort keys %AtmBox ) {
+            next ATTACHMENT_ID if lc $AtmBox{$AttachmentID}{ContentID} ne lc "<$ContentID>";
+
+            my %Attachment = $ArticleBackendObject->ArticleAttachment(
+                ArticleID => $Article{ArticleID},
+                FileID    => $AttachmentID,
+            );
+
+            my ( $ContentType ) = %Attachment && $Attachment{ContentType} ? ( $Attachment{ContentType} =~ /^([^;]+)/ ) : ();
+
+            $Content = $ContentType && $Attachment{Content} ? "data:$ContentType;base64," . MIME::Base64::encode_base64( $Attachment{Content} ) : "";
+
+            last ATTACHMENT_ID;
+        }
+
+        # return new runtime url
+        $Start . $Content . $End;
+    }egxi;
+
+    # inline images using Content-Location as identifier instead of Content-ID even RFC2557
+    # http://www.ietf.org/rfc/rfc2557.txt
+    # find matching attachment and replace it with runtlime url to image
+    ATTACHMENT:
+    for my $AttachmentID ( sort keys %AtmBox ) {
+        next ATTACHMENT if !$AtmBox{$AttachmentID}{ContentID};
+
+        # content id cleanup
+        $AtmBox{$AttachmentID}{ContentID} =~ s/^<//;
+        $AtmBox{$AttachmentID}{ContentID} =~ s/>$//;
+
+        next ATTACHMENT if !$AtmBox{$AttachmentID}{ContentID};
+
+        $Article{Body} =~ s{
+            (=|"|')(\Q$AtmBox{$AttachmentID}{ContentID}\E)("|'|>|\/>|\s)
+        }
+        {
+            my $Start= $1;
+            my $ContentID = $2;
+            my $End = $3;
+
+            my %Attachment = $ArticleBackendObject->ArticleAttachment(
+                ArticleID => $Article{ArticleID},
+                FileID    => $AttachmentID,
+            );
+
+            my ( $ContentType ) = %Attachment && $Attachment{ContentType} ? ( $Attachment{ContentType} =~ /^([^;]+)/ ) : ();
+
+            my $Content = $ContentType && $Attachment{Content} ? "data:$ContentType;base64," . MIME::Base64::encode_base64( $Attachment{Content} ) : "";
+            $Start . $Content . $End;
+        }egxi;
+    }
+
+
     my %Data = (
         Content            => $ArticleContent,
         ContentAlternative => '',
         ContentID          => '',
         ContentType        => 'text/html; charset="utf-8"',
         Disposition        => 'inline',
-    );
-
-    # reformat rich text document to have correct charset and links to
-    # inline documents
-    %Data = $LayoutObject->RichTextDocumentServe(
-        Data               => \%Data,
-        URL                => $URL,
-        Attachments        => \%AtmBox,
-        LoadExternalImages => $LoadExternalImages,
     );
 
     # if there is unexpectedly pgp decrypted content in the html email (OE),
@@ -1293,14 +1313,12 @@ sub _ArticleRender {
     my $CombinedStyles = join("\n", map { $_->[1] } @styles);
 
     #remove meta tag
-    $ArticleContent =~ s/<meta[^<>]*>//gse;
+    $ArticleContent =~ s/<meta[^<>]*>//g;
 
     return $LayoutObject->Output(
         TemplateFile => 'AgentTicketPrint/MIMEBase',
         Data         => {
             %Article,
-            VersionView => $Self->{VersionView},
-            VersionID => $Self->{VersionID},
             ArticleFields => \%ArticleFields,
             CommunicationChannel => $CommunicationChannel{DisplayName},
             Crypt => \%Flags,
@@ -1339,6 +1357,61 @@ sub _GetIncludedFieldOrdered {
     }
 
     return @Return;
+}
+
+=head2 _PrintPDF()
+
+Generates a PDF from an HTML file using Google Chrome in headless mode.
+
+This function requires the path to the HTML file to be specified in the
+C<HTMLFilePath> parameter. It retrieves the path to the Google Chrome binary
+from the configuration and executes Chrome with specific flags to convert the
+HTML file to a PDF.
+
+Returns the path of the resulting .pdf file.
+
+=cut
+
+sub _PrintPDF {
+    my ( $Self, %Param ) = @_;
+
+    # Check needed stuff.
+    # FileTempObject must be passed to prevent premature file deletion
+    for my $Needed (qw(HTMLFilePath FileTempObject)) {
+        if ( !$Param{$Needed} ) {
+            $Kernel::OM->Get('Kernel::System::Log')->Log(
+                Priority => 'error',
+                Message  => "Need $Needed!",
+            );
+            return;
+        }
+    }
+
+    my $ConfigObject = $Kernel::OM->Get('Kernel::Config');
+    my $FileTempObject = $Param{'FileTempObject'};
+
+    my $HTMLFilePath = $Param{HTMLFilePath};
+    my ($FileHandle, $PDFFilePath) = $FileTempObject->TempFile( 
+        Suffix => '.pdf' 
+    );
+    $FileHandle->close();
+
+    my $ChromePath = $ConfigObject->Get('GoogleChrome::Bin');
+    if ( !$ChromePath ) {
+        $Kernel::OM->Get('Kernel::System::Log')->Log(
+            Priority => 'error',
+            Message  => "Google Chrome path not configured!",
+        );
+        return 0;
+    }
+
+    my $CommandResult = `'$ChromePath' --no-sandbox --aggressive-cache-discard --headless --print-to-pdf='$PDFFilePath' --no-pdf-header-footer --virtual-time-budget=25000 '$HTMLFilePath' 2>&1`;
+    $Kernel::OM->Get('Kernel::System::Log')->Log(
+        Priority => 'debug',
+        Message  => "Chrome PDF Print: " . $CommandResult,
+    );
+
+    return $PDFFilePath;
 }
 
 1;

@@ -14,274 +14,311 @@
 # along with this program. If not, see <https://www.gnu.org/licenses/>.
 # --
 ## nofilter(TidyAll::Plugin::OTOBO::TT::ScriptUsage)
+<!DOCTYPE html>
+<html>
+
+    [% InsertTemplate("Copyright.tt") %]
+
+    <head>
+        <meta http-equiv="Content-type" content="text/html;charset=utf-8" />
+        <meta id="viewport" name="viewport" content="">
+        <meta name="robots" content="noindex,nofollow" />
+
+        [% InsertTemplate("AgentTicketPrint/PrintStyles.tt") %]
+
+        <title>[% Data.TitleArea | html %][% Config("ProductName") %]</title>
+    </head>
+    <body>
 [% RenderBlockStart("Header") %]
-<div class="PrintNotice">
-    <p>[% Translate("Preparing to print. Please wait.") | html %]</p>
-    <p>[% Translate("If there is no print dialog after a few seconds, please print this page manually via your browser.") | html %]</p>
-</div>
-<div class="ARIARoleMain TicketPrint UseArticleColors">
-    <div class="ClearLeft"></div>
-    <div class="Headline NoMargin">
-        <div class="Flag" title="[% Translate(Data.Priority) | html %]"><span class="PriorityID-[% Data.PriorityID | html %]">[% Translate(Data.Priority) | html %]</span></div>
-        <h1>
-            [% IF Data.ArticleCount == 1 %]
-                [% Data.Hook %][% Config('Ticket::HookDivider') %][% Data.TicketNumber | html %] &mdash; <br />[% Data.Title | html %]
-            [% ELSE %]
-                [% Data.Hook %][% Config('Ticket::HookDivider') %][% Data.TicketNumber | html %]
-            [% END %]
-        </h1>
-        <div id="PDFLogo">
-            <img src="[% Data.PDFLogo | html %]">
-        </div>
-    </div>
-
-    <div>
-        <div class="SidebarWidgets">
-
-            [% FOREACH Widget IN Data.SidebarWidgets; %]
-                [% IF Widget.Async; %]
-                    <div id="[% Widget.ElementID %]">
-                        <div class="WidgetIsLoading">
-                            <i class="fa fa-spinner fa-spin"></i>
-                        </div>
-                    </div>
-                [% ELSE; %]
-                    [% Widget.Output %]
-                [% END; %]
-            [% END; %]
-        </div>
-        <div class="MainColumn">
-
-[% RenderBlockStart("OverviewWidget") %]
+        <div class="ARIARoleMain TicketPrint UseArticleColors">
+            <div class="Headline NoMargin">
+                <div class="Flag" title="[% Translate(Data.Priority) | html %]"><span class="PriorityID-[% Data.PriorityID | html %]">[% Translate(Data.Priority) | html %]</span></div>
+                <h1>
+    [% IF Data.ArticleCount == 1 %]
+                    [% Data.Hook %][% Config('Ticket::HookDivider') %][% Data.TicketNumber | html %] &mdash; <br />[% Data.Title | html %]
+    [% ELSE %]
+                    [% Data.Hook %][% Config('Ticket::HookDivider') %][% Data.TicketNumber | html %]
+    [% END %]
+                </h1>
+                <div id="PDFLogo">
+                    <img src="[% Data.PDFLogo | html %]">
+                </div>
+            </div>
+            <div>
+    [% FOREACH Widget IN Data.SidebarWidgets; %]
+        [% IF Widget.Async; %]
+            <div id="[% Widget.ElementID %]">
+                <div class="WidgetIsLoading">
+                    <i class="fa fa-spinner fa-spin"></i>
+                </div>
+            </div>
+        [% ELSE; %]
+            [% Widget.Output %]
+        [% END; %]
+    [% END; %]
+    [% RenderBlockStart("OverviewWidget") %]
             <div class="WidgetSimple Expanded" id="DynamicFieldsWidget">
                 <div class="Header">
                     <h2>[% Translate(Data.WidgetTitle) | html %]</h2>
                 </div>
-[% RenderBlockStart("NextActivityDialogs") %]
+        [% RenderBlockStart("NextActivityDialogs") %]
                 <div class="LightRow Bottom">
                     
-[% RenderBlockStart("NoActivityDialogs") %]
+            [% RenderBlockStart("NoActivityDialogs") %]
                     <span class="ActionMessage">[% Translate("There are no dialogs available at this point in the process.") | html %]</span>
-[% RenderBlockEnd("NoActivityDialogs") %]
+            [% RenderBlockEnd("NoActivityDialogs") %]
                     <div class="Clear"></div>
                 </div>
-[% RenderBlockEnd("NextActivityDialogs") %]
+        [% RenderBlockEnd("NextActivityDialogs") %]
                 <div class="Content">
                     <div>
                         <fieldset>
-[% RenderBlockStart("OverviewWidgetDynamicFieldGroups") %]
-[% RenderBlockStart("OverviewWidgetDynamicFieldGroupSeparator") %]
+        [% RenderBlockStart("OverviewWidgetDynamicFieldGroups") %]
+            [% RenderBlockStart("OverviewWidgetDynamicFieldGroupSeparator") %]
                             <h2 class="FieldSetSeparator">[% Translate(Data.Name) | html %]</h2>
-[% RenderBlockEnd("OverviewWidgetDynamicFieldGroupSeparator") %]
-[% RenderBlockStart("OverviewWidgetDynamicField") %]
-[% RenderBlockStart("StandardField") %]
+            [% RenderBlockEnd("OverviewWidgetDynamicFieldGroupSeparator") %]
+            [% RenderBlockStart("OverviewWidgetDynamicField") %]
+                [% RenderBlockStart("StandardField") %]
                             <div class="FieldContainer DynamicFieldAutoResize">
                                 <label title="[% Data.Label | html %]">
                                     [% Data.Label | html %]:
                                 </label>
                                 <p class="Value CutValue DynamicField_[% Data.Name %]">
 <!-- OutputFilterHook_WidgetDynamicFieldBegin -->
-[% RenderBlockStart("OverviewWidgetDynamicFieldPlain") %]
+                    [% RenderBlockStart("OverviewWidgetDynamicFieldPlain") %]
                                     [% Data.Value %]
-[% RenderBlockEnd("OverviewWidgetDynamicFieldPlain") %]
+                    [% RenderBlockEnd("OverviewWidgetDynamicFieldPlain") %]
 <!-- OutputFilterHook_WidgetDynamicFieldEnd -->
                                 </p>
                                 <p class="ValueLong">
-[% RenderBlockStart("OverviewWidgetDynamicFieldValueLong") %]
+                    [% RenderBlockStart("OverviewWidgetDynamicFieldValueLong") %]
                                     [% Data.Value %]
-[% RenderBlockEnd("OverviewWidgetDynamicFieldValueLong") %]
+                    [% RenderBlockEnd("OverviewWidgetDynamicFieldValueLong") %]
                                 </p>
                                 <div class="Clear"></div>
                             </div>
-[% RenderBlockEnd("StandardField") %]
-[% RenderBlockStart("SetField") %]
+                [% RenderBlockEnd("StandardField") %]
+                [% RenderBlockStart("SetField") %]
                             <div class="SetDynamicField">
-[% RenderBlockStart("DynamicFieldSetSeparator") %]
+                    [% RenderBlockStart("DynamicFieldSetSeparator") %]
                                 <h2 class="FieldSetSeparator">[% Translate(Data.Name) | html %]</h2>
-[% RenderBlockEnd("DynamicFieldSetSeparator") %]
+                    [% RenderBlockEnd("DynamicFieldSetSeparator") %]
                                 <div>
-[% RenderBlockStart("SetDynamicField") %]
+                    [% RenderBlockStart("SetDynamicField") %]
                                     <div class="FieldContainer DynamicFieldAutoResize">
                                         <label title="[% Data.Label | html %]">
                                             [% Data.Label | html %]
-                                       </label>
+                                        </label>
                                         <p class="Value CutValue DynamicField_[% Data.Name %]">
 <!-- OutputFilterHook_SetDynamicFieldBegin -->
-[% RenderBlockStart("SetDynamicFieldPlain") %]
+                        [% RenderBlockStart("SetDynamicFieldPlain") %]
                                             [% Data.Value %]
-[% RenderBlockEnd("SetDynamicFieldPlain") %]
+                        [% RenderBlockEnd("SetDynamicFieldPlain") %]
 <!-- OutputFilterHook_SetDynamicFieldEnd -->
                                         </p>
                                         <p class="ValueLong">
-[% RenderBlockStart("SetDynamicFieldValueLong") %]
+                        [% RenderBlockStart("SetDynamicFieldValueLong") %]
                                             [% Data.Value %]
-[% RenderBlockEnd("SetDynamicFieldValueLong") %]
+                        [% RenderBlockEnd("SetDynamicFieldValueLong") %]
                                         </p>
                                         <div class="Clear"></div>
                                     </div>
-[% RenderBlockEnd("SetDynamicField") %]
+                    [% RenderBlockEnd("SetDynamicField") %]
                                 </div>
                                 <div class="Clear"></div>
                             </div>
-[% RenderBlockEnd("SetField") %]
-[% RenderBlockEnd("OverviewWidgetDynamicField") %]
-[% RenderBlockEnd("OverviewWidgetDynamicFieldGroups") %]
+                [% RenderBlockEnd("SetField") %]
+            [% RenderBlockEnd("OverviewWidgetDynamicField") %]
+        [% RenderBlockEnd("OverviewWidgetDynamicFieldGroups") %]
                         </fieldset>
                     </div>
                 </div>
             </div>
-[% RenderBlockEnd("OverviewWidget") %]
+    [% RenderBlockEnd("OverviewWidget") %]
 
-[% IF Data.ShowArticleList %]
+    [% IF Data.ShowArticleList %]
             <div id="ArticleTree">
-[% Data.ArticleTree %]
+                [% Data.ArticleTree %]
             </div>
-[% END %]
+    [% END %]
 
-[% RenderBlockStart("HintNoArticles") %]
+    [% RenderBlockStart("HintNoArticles") %]
             <div class="WidgetSimple">
                 <div class="Content">
                     [% Translate("This item has no articles yet.") | html %]
                 </div>
             </div>
-[% RenderBlockEnd("HintNoArticles") %]
+    [% RenderBlockEnd("HintNoArticles") %]
 
             <div id="ArticleItems">
-[% Data.ArticleItems %]
+                [% Data.ArticleItems %]
             </div>
 
-            [% FOREACH Widget IN Data.MainWidgets; %]
-                [% IF Widget.Async; %]
-                    <div id="[% Widget.ElementID %]"></div>
-                [% ELSE; %]
-                    [% Widget.Output %]
-                [% END; %]
-            [% END; %]
-
+    [% FOREACH Widget IN Data.MainWidgets; %]
+        [% IF Widget.Async; %]
+            <div id="[% Widget.ElementID %]"></div>
+        [% ELSE; %]
+            [% Widget.Output %]
+        [% END; %]
+    [% END; %]
+            </div>
         </div>
-        <div class="Clear"></div>
-    </div>
-
-</div>
 [% RenderBlockEnd("Header") %]
 
 [% RenderBlockStart("Tree") %]
-<div class="WidgetSimple">
-    <div class="Header">
-        <h2>
-            [% Translate("Article Overview - %s Article(s)", Data.ArticleCount) | html %]
-        </h2>
-    </div>
-    <div class="Content">
+        <div class="WidgetSimple">
+            <div class="Header">
+                <h2>
+                    [% Translate("Article Overview - %s Article(s)", Data.ArticleCount) | html %]
+                </h2>
+            </div>
+            <div class="Content">
+    [% RenderBlockStart("ArticleList") %]
+                <div class="TicketList">
+                    <div id="ArticleTableBody" class="ActionRow">
+                        <div class="Scroller">
+                            <table id="ArticleTable" class="DataTable [% Data.TableClasses | html %]">
+                                <thead>
+                                    <tr>
+                                        <th class="No Sortable InitialSorting [% Data.ZoomExpandSortOrder %]"><span>[% Translate("No.") | html %]</span></th>
+                                        <th class="Direction Sortable"><span title="[% Translate("Direction") | html %]"><i class="fa fa-exchange"></i></span></th>
+                                        <th class="Sender Sortable"><span>[% Translate("Sender") | html %]</span></th>
+                                        <th class="Channel Sortable"><span>[% Translate("Via") | html %]</span></th>
+                                        <th class="Subject Sortable"><span>[% Translate("Subject") | html %]</span></th>
+                                        <th class="Created Sortable"><span>[% Translate("Created") | html %]</span></th>
+                                        <th class="ArticleEdit Sortable Center">
+                                            <div title="[% Translate("Article Edited") | html %]">
+                                                <i class="fa fa-edit"></i>
+                                            </div>
+                                        </th>
+                                        <th class="Attachments Last Center">
+                                            <div title="[% Translate("Attachments") | html %]">
+                                                <i class="fa fa-paperclip"></i>
+                                            </div>
+                                        </th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+        [% RenderBlockStart("TreeItem") %]
+                                    <tr class="[% Data.SenderType | html %] [% IF Data.SenderType == 'customer' %]Incoming[% ELSE %]Outgoing[% END %] [% IF Data.IsVisibleForCustomer %]VisibleForCustomer[% ELSE %]NotVisibleForCustomer[% END %] [% IF Data.ArticleDeleted == "1" %] ArticleDeleted [% END %] [% Data.ClassRow | html %]" id="Row[% Data.ArticleNumber | uri %]">
+                                        <td class="No">
+                                            [% Data.ArticleNumber | html %]
+                                            <input type="hidden" class="ArticleInfo" name="Link[% Data.ArticleNumber | uri %]" value="[% Env("Baselink") %]Action=AgentTicketZoom;Subaction=ArticleUpdate;Count=[% Data.ArticleNumber | uri %];TicketID=[% Data.TicketID | html %];ArticleID=[% Data.ArticleID | html %];"/>
+                                            <input type="hidden" class="ArticleID" value="[% Data.ArticleID | html %]" />
+                                            <input type="hidden" class="SortData" value="[% Data.ArticleNumber | html %]" />
+                                        </td>
+                                        <td class="Direction">
+            [% RenderBlockStart("TreeItemDirectionIncoming") %]
+                                            <span class="Direction Incoming" title="[% Translate("Incoming message") | html %]">
+                                                <i class="fa fa-long-arrow-left"></i>
+                                            </span>
+                                            <input type="hidden" class="SortData" value="0" />
+            [% RenderBlockEnd("TreeItemDirectionIncoming") %]
+            [% RenderBlockStart("TreeItemDirectionOutgoing") %]
+                                            <span class="Direction Outgoing" title="[% Translate("Outgoing message") | html %]">
+                                                <i class="fa fa-long-arrow-right"></i>
+                                            </span>
+                                            <input type="hidden" class="SortData" value="1" />
+            [% RenderBlockEnd("TreeItemDirectionOutgoing") %]
+            [% RenderBlockStart("TreeItemDirectionInternal") %]
+                                            <span class="Direction Internal" title="[% Translate("Internal message") | html %]"></span>
+                                            <input type="hidden" class="SortData" value="2" />
+            [% RenderBlockEnd("TreeItemDirectionInternal") %]
+                                        </td>
+                                        <td class="Sender">
+                                            <div title="[% Data.ArticleFields.Sender.Value | html %]"><span>[% Data.ArticleFields.Sender.Realname | truncate(100) | html %]</span></div>
+                                            <input type="hidden" class="SortData" value="[% Data.ArticleFields.Sender.Value | html %]" />
+                                        </td>
+                                        <td class="Channel">
+                                            <div>[% Translate(Data.ChannelDisplayName) | html %]
+            [% IF Data.ChannelInvalid %]
+                                                <span title="[% Translate("Missing channel") | html %]">
+                                                    <i class="fa fa-exclamation-triangle Warning" aria-hidden="true"></i>
+                                                </span>
+            [% END %]
+            [% IF Data.TransmissionStatus && Data.TransmissionStatus.Status == 'Failed' %]
+                                                <span title="[% Translate("Sending of this message has failed.") | html %]">
+                                                    <i class="fa fa-times Error" aria-hidden="true"></i>
+                                                </span>
+            [% END %]
+                                            </div>
+                                            <input type="hidden" class="SortData" value="[% Translate(Data.ChannelDisplayName) | html %]" />
+                                        </td>
+                                        <td class="Subject">
+                                            <div title="[% Data.ArticleFields.Subject.Value | html %]"><span>[% Data.ArticleFields.Subject.Value | truncate(100) | html %]</span></div>
+                                            <input type="hidden" class="SortData" value="[% Data.ArticleFields.Subject.Value | html %]" />
+                                        </td>
+                                        <td class="Created">
+                                            <div title="[% Data.CreateTime | Localize('TimeShort') %]"><span>[% Data.CreateTime | Localize("TimeShort") %]</span></div>
+                                            # Include custom sorting information: date in ISO format.
+                                            # Other date formats cannot be sorted reliably.
+                                            <input type="hidden" class="SortData" value="[% Data.CreateTime | html %]" />
+                                        </td>
+                                        <td class="Center">
+                                            <div title="[% Translate("The article was edited") | html %]">
+            [% IF Data.IsEdited == "1" %]
+                                                <p class="EditIcon"><i class="fa fa-clone"></i></p>
+            [% END %]
+                                            </div>
+                                            <input type="hidden" class="SortData" value="[% Data.IsEdited | html %]" />
+                                        </td>
 
-[% RenderBlockStart("ArticleList") %]
-        <div class="TicketList">
-            <div id="ArticleTableBody" class="ActionRow">
-                <div class="Scroller">
-                    <table id="ArticleTable" class="DataTable [% Data.TableClasses | html %]">
-                        <thead>
-                            <tr>
-                                <th class="No Sortable InitialSorting [% Data.ZoomExpandSortOrder %]"><span>[% Translate("No.") | html %]</span></th>
-                                <th class="Direction Sortable"><span title="[% Translate("Direction") | html %]"><i class="fa fa-exchange"></i></span></th>
-                                <th class="Sender Sortable"><span>[% Translate("Sender") | html %]</span></th>
-                                <th class="Channel Sortable"><span>[% Translate("Via") | html %]</span></th>
-                                <th class="Subject Sortable"><span>[% Translate("Subject") | html %]</span></th>
-                                <th class="Created Sortable"><span>[% Translate("Created") | html %]</span></th>
-                                <th class="ArticleEdit Sortable Center">
-                                    <div title="[% Translate("Article Edited") | html %]">
-                                        <i class="fa fa-edit"></i>
-                                    </div>
-                                </th>
-                                <th class="Attachments Last Center">
-                                    <div title="[% Translate("Attachments") | html %]">
-                                        <i class="fa fa-paperclip"></i>
-                                    </div>
-                                </th>
-                            </tr>
-                        </thead>
-                        <tbody>
-[% RenderBlockStart("TreeItem") %]
-                            <tr class="[% Data.SenderType | html %] [% IF Data.SenderType == 'customer' %]Incoming[% ELSE %]Outgoing[% END %] [% IF Data.IsVisibleForCustomer %]VisibleForCustomer[% ELSE %]NotVisibleForCustomer[% END %] [% IF Data.ArticleDeleted == "1" %] ArticleDeleted [% END %] [% Data.ClassRow | html %]" id="Row[% Data.ArticleNumber | uri %]">
-                                <td class="No">
-                                    [% Data.ArticleNumber | html %]
-                                    <input type="hidden" class="ArticleInfo" name="Link[% Data.ArticleNumber | uri %]" value="[% Env("Baselink") %]Action=AgentTicketZoom;Subaction=ArticleUpdate;Count=[% Data.ArticleNumber | uri %];TicketID=[% Data.TicketID | html %];ArticleID=[% Data.ArticleID | html %];"/>
-                                    <input type="hidden" class="ArticleID" value="[% Data.ArticleID | html %]" />
-                                    <input type="hidden" class="SortData" value="[% Data.ArticleNumber | html %]" />
-                                </td>
-                                <td class="Direction">
-[% RenderBlockStart("TreeItemDirectionIncoming") %]
-                                    <span class="Direction Incoming" title="[% Translate("Incoming message") | html %]">
-                                        <i class="fa fa-long-arrow-left"></i>
-                                    </span>
-                                    <input type="hidden" class="SortData" value="0" />
-[% RenderBlockEnd("TreeItemDirectionIncoming") %]
-[% RenderBlockStart("TreeItemDirectionOutgoing") %]
-                                    <span class="Direction Outgoing" title="[% Translate("Outgoing message") | html %]">
-                                        <i class="fa fa-long-arrow-right"></i>
-                                    </span>
-                                    <input type="hidden" class="SortData" value="1" />
-[% RenderBlockEnd("TreeItemDirectionOutgoing") %]
-[% RenderBlockStart("TreeItemDirectionInternal") %]
-                                    <span class="Direction Internal" title="[% Translate("Internal message") | html %]"></span>
-                                    <input type="hidden" class="SortData" value="2" />
-[% RenderBlockEnd("TreeItemDirectionInternal") %]
-                                </td>
-                                <td class="Sender">
-                                    <div title="[% Data.ArticleFields.Sender.Value | html %]"><span>[% Data.ArticleFields.Sender.Realname | truncate(100) | html %]</span></div>
-                                    <input type="hidden" class="SortData" value="[% Data.ArticleFields.Sender.Value | html %]" />
-                                </td>
-                                <td class="Channel">
-                                    <div>[% Translate(Data.ChannelDisplayName) | html %]
-                                    [% IF Data.ChannelInvalid %]
-                                        <span title="[% Translate("Missing channel") | html %]">
-                                            <i class="fa fa-exclamation-triangle Warning" aria-hidden="true"></i>
-                                        </span>
-                                    [% END %]
-                                    [% IF Data.TransmissionStatus && Data.TransmissionStatus.Status == 'Failed' %]
-                                        <span title="[% Translate("Sending of this message has failed.") | html %]">
-                                            <i class="fa fa-times Error" aria-hidden="true"></i>
-                                        </span>
-                                    [% END %]
-                                    </div>
-                                    <input type="hidden" class="SortData" value="[% Translate(Data.ChannelDisplayName) | html %]" />
-                                </td>
-                                <td class="Subject">
-                                    <div title="[% Data.ArticleFields.Subject.Value | html %]"><span>[% Data.ArticleFields.Subject.Value | truncate(100) | html %]</span></div>
-                                    <input type="hidden" class="SortData" value="[% Data.ArticleFields.Subject.Value | html %]" />
-                                </td>
-                                <td class="Created">
-                                    <div title="[% Data.CreateTime | Localize('TimeShort') %]"><span>[% Data.CreateTime | Localize("TimeShort") %]</span></div>
-# Include custom sorting information: date in ISO format.
-# Other date formats cannot be sorted reliably.
-                                    <input type="hidden" class="SortData" value="[% Data.CreateTime | html %]" />
-                                </td>
-                                <td class="Center">
-                                    <div title="[% Translate("The article was edited") | html %]">
-                                        [% IF Data.IsEdited == "1" %]
-                                            <p class="EditIcon"><i class="fa fa-clone"></i></p>
-                                        [% END %]
-                                    </div>
-                                    <input type="hidden" class="SortData" value="[% Data.IsEdited | html %]" />
-                                </td>
-
-                                <td class="Attachments Center Attachment Fixed NonTextContent">
-[% RenderBlockStart("TreeItemAttachment") %]
-[% PROCESS ArticleAttachments.tt %]
-[% RenderBlockEnd("TreeItemAttachment") %]
-[% RenderBlockStart("TreeItemNoAttachment") %]
-                                    <span class="NoContent"></span>
-[% RenderBlockEnd("TreeItemNoAttachment") %]
-                                </td>
-                            </tr>
-[% RenderBlockEnd("TreeItem") %]
-                        </tbody>
-                    </table>
+                                        <td class="Attachments Center Attachment Fixed NonTextContent">
+            [% RenderBlockStart("TreeItemAttachment") %]
+                                            [% PROCESS ArticleAttachments.tt %]
+            [% RenderBlockEnd("TreeItemAttachment") %]
+            [% RenderBlockStart("TreeItemNoAttachment") %]
+                                            <span class="NoContent"></span>
+            [% RenderBlockEnd("TreeItemNoAttachment") %]
+                                        </td>
+                                    </tr>
+        [% RenderBlockEnd("TreeItem") %]
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
                 </div>
+    [% RenderBlockEnd("ArticleList") %]
             </div>
         </div>
-[% RenderBlockEnd("ArticleList") %]
-    </div>
-</div>
 [% RenderBlockEnd("Tree") %]
 
-[% Data.ArticleWidgetsHTML %]
+        [% Data.ArticleWidgetsHTML %]
+
+        <script type="text/javascript">
+        //<![CDATA[
+            "use strict";
+
+            Core.Init.ExecuteInit('JS_LOADED');
+
+            Core.App.Ready(function () {
+
+                Core.Init.ExecuteInit('DOCUMENT_READY');
+
+                [% PROCESS JSDataInsert %]
+
+                Core.Init.ExecuteInit('CONFIG_LOADED');
+                Core.Init.ExecuteInit('APP_GLOBAL_EARLY');
+                Core.Init.ExecuteInit('APP_GLOBAL');
+                Core.Init.ExecuteInit('APP_GLOBAL_LATE');
+
+            });
+        //]]>
+        </script>
+
+        <script type="text/javascript">
+        //<![CDATA[
+            "use strict";
+            Core.App.Ready(function () {
+                Core.Init.ExecuteInit('APP_MODULE_EARLY');
+
+                [% PROCESS JSOnDocumentCompleteInsert %]
+
+                Core.Init.ExecuteInit('APP_MODULE');
+                Core.Init.ExecuteInit('APP_MODULE_LATE');
+            });
+        //]]>
+        </script>
+
+    </body>
+</html>

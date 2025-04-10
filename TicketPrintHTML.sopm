@@ -9,12 +9,10 @@
     <Description Lang="en">Print Tickets with advanced formatting, including images.</Description>
     <Description Lang="de">Ticket Druck mit verbesserter Formatierung inklusive Bildern.</Description>
     <Filelist>
-		<File Permission="660" Location="var/httpd/htdocs/skins/Agent/default/css/Agent.TicketPrintHTML.css" />
-		<File Permission="660" Location="var/httpd/htdocs/js/Agent.TicketPrint.js" />
 		<File Permission="660" Location="Kernel/Config/Files/XML/TicketPrintHTML.xml" />
 		<File Permission="660" Location="Custom/Kernel/Modules/AgentTicketPrint.pm" />
 		<File Permission="660" Location="Kernel/Output/HTML/Templates/Standard/AgentTicketPrint.tt"	/>
-		<File Permission="660" Location="Custom/Kernel/Output/HTML/Templates/Standard/AgentTicketZoom/ArticleRender/MIMEBase.tt" />
-		<File Permission="660" Location="var/httpd/htdocs/common/img/logo-otobo.png" />
+		<File Permission="660" Location="/Kernel/Output/HTML/Templates/Standard/AgentTicketPrint/MIMEBase.tt" />
+		<File Permission="660" Location="/Kernel/Output/HTML/Templates/Standard/AgentTicketPrint/PrintStyles.tt" />
 	</Filelist>
 </otobo_package>

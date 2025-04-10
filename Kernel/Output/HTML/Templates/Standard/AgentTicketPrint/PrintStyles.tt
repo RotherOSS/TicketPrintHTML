@@ -1,17 +1,52 @@
-/* OTOBO is a web-based ticketing system for service organisations.
+# --
+# OTOBO is a web-based ticketing system for service organisations.
+# --
+# Copyright (C) 2001-2020 OTRS AG, https://otrs.com/
+# Copyright (C) 2019-2025 Rother OSS GmbH, https://otobo.io/
+# --
+# This program is free software: you can redistribute it and/or modify it under
+# the terms of the GNU General Public License as published by the Free Software
+# Foundation, either version 3 of the License, or (at your option) any later version.
+# This program is distributed in the hope that it will be useful, but WITHOUT
+# ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+# FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+# You should have received a copy of the GNU General Public License
+# along with this program. If not, see <https://www.gnu.org/licenses/>.
+# --
+## nofilter(TidyAll::Plugin::OTOBO::TT::ScriptUsage)
 
-Copyright (C) 2001-2020 OTRS AG, https://otrs.com/
-Copyright (C) 2019-2025 Rother OSS GmbH, https://otobo.io/
+# temporarily contains copies of the following CSS files:
+#
+# Core.Agent.CustomerUser.OpenTicket.css
+# Core.Agent.Daemon.css
+# Core.Animations.css
+# Core.Default.css
+# Core.Dialog.css
+# Core.Footer.css
+# Core.Forms.css
+# Core.Header.css
+# Core.InputFields.css
+# Core.Login.css
+# Core.OverviewControl.css
+# Core.OverviewLarge.css
+# Core.OverviewMedium.css
+# Core.OverviewSmall.css
+# Core.PageLayout.css
+# Core.Print.css
+# Core.Reset.css
+# Core.Table.css
+# Core.TicketDetail.css
+# Core.Tooltip.css
+# Core.Widget.css
+# Core.WidgetMenu.css
+# Core.DynamicFieldDB.css
 
-This program is free software: you can redistribute it and/or modify it under
-the terms of the GNU General Public License as published by the Free Software
-Foundation, either version 3 of the License, or (at your option) any later version.
-This program is distributed in the hope that it will be useful, but WITHOUT
-ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
-FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
-You should have received a copy of the GNU General Public License
-along with this program. If not, see <https://www.gnu.org/licenses/>.
-*/
+<style>
+
+* {
+    orphans: 5;
+    widows: 5;
+}
 
 /**
  * @package     AdvancedTicketPrint
@@ -23,34 +58,6 @@ body {
     width: 775px;
     margin-left: auto;
     margin-right: auto;
-}
-
-@media print {
-    div.PrintNotice {
-        display: none;
-    }
-
-    div {
-        /*-webkit-box-decoration-break: slice;
-        box-decoration-break: slice;*/
-    }
-
-    iframe {
-        page-break-inside: auto;
-        page-break-before: always;
-        page-break-after: always;
-    }
-}
-
-div.PrintNotice {
-    text-align: center;
-    margin-bottom: 50px;
-    background-color: #c4cdfa;
-    background-color: var(--colNotifyOK);
-    padding: 12px;
-    width: 100%;
-    font-size: 1.5em;
-    box-sizing: border-box;
 }
 
 div.TicketPrint .Headline {
@@ -69,13 +76,13 @@ div.TicketPrint div.Headline > h1 {
     flex-grow: 1;
 }
 
-#PDFLogo {
-    height: 30px;
+div#PDFLogo {
+    width: 30%;
     margin-left: 12px;
 }
 
-#PDFLogo > img {
-    height: 100%;
+div#PDFLogo > img {
+    width: 100%;
 }
 
 div.TicketPrint {
@@ -91,9 +98,16 @@ div.TicketPrint .WidgetSimple {
     padding-top: 5px;
     padding-left: 5px;
     border: 1px solid;
+    border-color: #cdcdd8;
+    border-color: var(--colBGMediumDark);
     box-shadow: none;
     margin-top: 15px;
     margin-bottom: 15px;
+}
+
+div.TicketPrint .WidgetSimple * {
+    font-size: 12px;
+    line-height: 1.2em;
 }
 
 div.TicketPrint #ArticleTableBody .Scroller,
@@ -160,6 +174,7 @@ div.TicketPrint.UseArticleColors #ArticleItems .ArticleMailContent iframe {
 
 .TicketPrint .WidgetSimple .Content label {
     font-weight: bold;
+    color: #00023c;
     color: var(--colTextDark);
 }
 
@@ -11297,3 +11312,4 @@ with added @media print
     
 } /* end @media */
     
+</style>

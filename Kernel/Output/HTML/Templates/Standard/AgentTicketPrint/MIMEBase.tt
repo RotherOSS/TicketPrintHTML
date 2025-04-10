@@ -21,7 +21,7 @@
     <div class="WidgetSimple Expanded [% Data.SenderType | html %] [% IF Data.SenderType == 'customer' %]Incoming[% ELSE %]Outgoing[% END %] [% IF Data.IsVisibleForCustomer %]VisibleForCustomer[% ELSE %]NotVisibleForCustomer[% END %]">
         <div class="Header">
             <h2>
-                [% IF Data.VersionView == 1 %] [% Translate("Version") | html %] [% Translate("#%s", Data.VersionID) | html %] [% ELSE %][% Translate("#%s", Data.ArticleNumber) | html %] [% END %] &ndash; [% Data.ArticleFields.Subject.Value | truncate(100) | html %]
+                [% Translate("#%s", Data.ArticleNumber) | html %] &ndash; [% Data.ArticleFields.Subject.Value | truncate(100) | html %]
                 &ndash; <span class="[% Data.ArticleFields.Sender.ValueHidden | html %]">[% Data.ArticleFields.Sender.Value | html %]</span> <span class="[% Data.ArticleFields.Sender.RealnameHidden | html %]">[% Data.ArticleFields.Sender.Realname | html %]</span>
                 &ndash; <span title="[% Translate("Created") | html %]: [% Data.CreateTime | Localize("TimeShort") %]">[% Data.CreateTime | Localize("TimeShort") %]</span> [% Translate("via %s", Translate(Data.CommunicationChannel)) | html %]
 [% IF Data.CreateByUser %]
@@ -35,6 +35,10 @@
                 [% IF Data.HTML %]
                     <style>
                         [% Data.Styles %]
+                        .ck-content #templateContainer td.bodyContent > h1 {
+                            background-color: #fff !important;
+                            color: #00023c !important;
+                        }
                     </style>
                     <div class="ck-content">
                         [% Data.HTML %]
