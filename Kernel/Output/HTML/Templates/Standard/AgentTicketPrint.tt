@@ -35,9 +35,6 @@
                 <div class="Flag" title="[% Translate(Data.Priority) | html %]"><span class="PriorityID-[% Data.PriorityID | html %]">[% Translate(Data.Priority) | html %]</span></div>
                 <h1>
                     [% Data.Hook %][% Config('Ticket::HookDivider') %][% Data.TicketNumber | html %] &mdash; <br />[% Data.Title | html %]
-    [% ELSE %]
-                    [% Data.Hook %][% Config('Ticket::HookDivider') %][% Data.TicketNumber | html %]
-    [% END %]
                 </h1>
                 <div id="PDFLogo">
                     <img src="[% Data.PDFLogo | html %]">
