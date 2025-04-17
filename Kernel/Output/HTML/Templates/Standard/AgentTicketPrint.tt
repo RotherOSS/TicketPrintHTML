@@ -34,7 +34,6 @@
             <div class="Headline NoMargin">
                 <div class="Flag" title="[% Translate(Data.Priority) | html %]"><span class="PriorityID-[% Data.PriorityID | html %]">[% Translate(Data.Priority) | html %]</span></div>
                 <h1>
-    [% IF Data.ArticleCount == 1 %]
                     [% Data.Hook %][% Config('Ticket::HookDivider') %][% Data.TicketNumber | html %] &mdash; <br />[% Data.Title | html %]
     [% ELSE %]
                     [% Data.Hook %][% Config('Ticket::HookDivider') %][% Data.TicketNumber | html %]
@@ -44,17 +43,8 @@
                     <img src="[% Data.PDFLogo | html %]">
                 </div>
             </div>
-            <div>
-    [% FOREACH Widget IN Data.SidebarWidgets; %]
-        [% IF Widget.Async; %]
-            <div id="[% Widget.ElementID %]">
-                <div class="WidgetIsLoading">
-                    <i class="fa fa-spinner fa-spin"></i>
-                </div>
-            </div>
-        [% ELSE; %]
+    [% FOREACH Widget IN Data.Widgets; %]
             [% Widget.Output %]
-        [% END; %]
     [% END; %]
     [% RenderBlockStart("OverviewWidget") %]
             <div class="WidgetSimple Expanded" id="DynamicFieldsWidget">
@@ -136,12 +126,6 @@
             </div>
     [% RenderBlockEnd("OverviewWidget") %]
 
-    [% IF Data.ShowArticleList %]
-            <div id="ArticleTree">
-                [% Data.ArticleTree %]
-            </div>
-    [% END %]
-
     [% RenderBlockStart("HintNoArticles") %]
             <div class="WidgetSimple">
                 <div class="Content">
@@ -161,7 +145,6 @@
             [% Widget.Output %]
         [% END; %]
     [% END; %]
-            </div>
         </div>
 [% RenderBlockEnd("Header") %]
 
