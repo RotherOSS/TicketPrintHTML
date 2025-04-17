@@ -23,11 +23,7 @@ Following installation, this package is active and usable right away.
 
 Tickets and their articles are now printed in their original styling. This especially includes content such as inline images.
 
-These are the most notable options for configuring how Tickets are printed:
-
-- Printing a list of all articles in the ticket: :ref:`Ticket::Frontend::AgentTicketPrint###ShowArticleList`
-
-- Adding the logo to be printed at the top of the page: :ref:`Ticket::Frontend::AgentTicketPrint###PrintLogoFile`
+The logo to be printed at the top of the page can be specified with : :ref:`Ticket::Frontend::AgentTicketPrint###PrintLogoFile`
 
 A complete list of options can be found in the :ref:`Ticket::Frontend::AgentTicketPrint###Configuration Reference`
 
@@ -46,6 +42,8 @@ Packages
 
 .. Package Name x.x.x
 
+\-
+
 Third-party software
 ^^^^^^^^^^^^^^^^^^^^
 \-
@@ -56,9 +54,6 @@ Configuration Reference
 Frontend::Agent::View::TicketPrint
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Ticket::Frontend::AgentTicketPrint###ShowArticleList
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-Whether or not a list of all articles is added when printing a ticket.
 
 Ticket::Frontend::AgentTicketPrint###PrintLogoFile
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""

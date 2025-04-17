@@ -351,7 +351,7 @@ sub MaskAgentPrint {
 
     my $MainObject = $Kernel::OM->Get('Kernel::System::Main');
 
-    my %Widgets;
+    my @Widgets;
     WIDGET:
     for my $Key ( sort keys %{ $Self->{DisplaySettings}->{Widgets} // {} } ) {
         my $Config = $Self->{DisplaySettings}->{Widgets}->{$Key};
@@ -380,14 +380,11 @@ sub MaskAgentPrint {
         next WIDGET unless $WidgetOutput;
 
         $WidgetOutput->{Rank} //= $Key;
-        my $Location = $WidgetOutput->{Location} || $Config->{Location};
-        push @{ $Widgets{$Location} }, $WidgetOutput;
+        push @Widgets, $WidgetOutput;
     }
-    for my $Location ( sort keys %Widgets ) {
-        $Param{ $Location . 'Widgets' } = [
-            sort { $a->{Rank} cmp $b->{Rank} } @{ $Widgets{$Location} }
-        ];
-    }
+    $Param{ 'Widgets' } = [
+        sort { $a->{Rank} cmp $b->{Rank} } @Widgets
+    ];
 
     # set display options
     $Param{Hook} = $ConfigObject->Get('Ticket::Hook') || 'Ticket#';

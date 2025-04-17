@@ -43,16 +43,18 @@
 
 <style>
 
-* {
-    orphans: 5;
-    widows: 5;
-}
-
 /**
  * @package     AdvancedTicketPrint
  * @section     Application
  * @subsection  Ticket
  */
+
+
+* {
+    orphans: 5;
+    widows: 5;
+}
+
 body {
     background-color: white !important;
     width: 775px;
@@ -60,11 +62,22 @@ body {
     margin-right: auto;
 }
 
-div.TicketPrint .Headline {
+div.TicketPrint {
+    display: grid;
+    grid-auto-flow: row dense;
+    grid-auto-rows: min-content;
+    grid-template-columns: 1fr 1fr;
+    column-gap: 4px;
+    padding-left: 20px;
+    padding-right: 20px;
+}
+
+div.TicketPrint > .Headline {
     display: flex;
     flex-direction: row;
     height: fit-content;
     align-items: end;
+    grid-column: 1 / span 2;
 }
 
 div.TicketPrint div.Headline > h1 {
@@ -85,13 +98,10 @@ div#PDFLogo > img {
     width: 100%;
 }
 
-div.TicketPrint {
-    padding-left: 20px;
-    padding-right: 20px;
-}
-
-div.TicketPrint h2 {
+div.TicketPrint h2,
+div.TicketPrint h2 * {
     font-weight: bold;
+    font-size: 13px;
 }
 
 div.TicketPrint .WidgetSimple {
@@ -105,18 +115,27 @@ div.TicketPrint .WidgetSimple {
     margin-bottom: 15px;
 }
 
+div.TicketPrint > .WidgetSimple {
+    box-sizing: border-box;
+    float: none;
+}
+
+div.TicketPrint #ArticleItems {
+    grid-column: 1 / span 2;
+}
+
 div.TicketPrint .WidgetSimple * {
-    font-size: 12px;
-    line-height: 1.2em;
+    font-size: 11px;
+    line-height: 1.1em;
+    flex-grow: 1;
 }
 
-div.TicketPrint #ArticleTableBody .Scroller,
-.TicketPrint .ArticleMailContent iframe {
+div.TicketPrint .WidgetSimple .Content {
+    padding: 4px;
+}
+
+div.TicketPrint #ArticleTableBody .Scroller{
     height: unset;
-}
-
-div.TicketPrint.UseArticleColors #ArticleItems .ArticleMailContent iframe {
-    border: none;
 }
 
 .TicketPrint .WidgetSimple > .Header .WidgetAction,
@@ -173,9 +192,14 @@ div.TicketPrint.UseArticleColors #ArticleItems .ArticleMailContent iframe {
 }
 
 .TicketPrint .WidgetSimple .Content label {
+    width: 30%;
     font-weight: bold;
     color: #00023c;
     color: var(--colTextDark);
+}
+
+.TicketPrint .WidgetSimple .Content p.Value {
+    margin-left: 30%;
 }
 
 .TicketPrint #DynamicFieldsWidget .FieldContainer {
