@@ -134,6 +134,13 @@ div.TicketPrint .WidgetSimple .Content {
     padding: 4px;
 }
 
+div.TicketPrint .WidgetSimple .Content .Warning,
+div.TicketPrint .WidgetSimple .Content .Error,
+div.TicketPrint .WidgetSimple .Content .Notice,
+div.TicketPrint .WidgetSimple .Content .Confirmation {
+    color: var(--colTextDark);
+}
+
 div.TicketPrint #ArticleTableBody .Scroller{
     height: unset;
 }
