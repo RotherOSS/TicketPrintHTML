@@ -35,9 +35,7 @@
         </Value>
     </Setting>
     <Setting Name="Ticket::Frontend::AgentTicketPrint###Widgets###0100-TicketInformation" Required="0" Valid="1">
-        <Description Translatable="1">
-            Printing information usually visible in the Ticket Information Widget for the Zoom View sidebar.
-        </Description>
+        <Description Translatable="1">Printing information usually visible in the Ticket Information Widget for the Zoom View sidebar.</Description>
         <Navigation>Frontend::Agent::View::TicketPrint</Navigation>
         <Value>
             <Hash>
@@ -46,9 +44,7 @@
         </Value>
     </Setting>
     <Setting Name="Ticket::Frontend::AgentTicketPrint###Widgets###0200-CustomerInformation" Required="0" Valid="1">
-        <Description Translatable="1">
-            Printing information usually visible in the Customer Information Widget for the Zoom View sidebar.
-        </Description>
+        <Description Translatable="1">Printing information usually visible in the Customer Information Widget for the Zoom View sidebar.</Description>
         <Navigation>Frontend::Agent::View::TicketPrint</Navigation>
         <Value>
             <Hash>

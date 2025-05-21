@@ -71,16 +71,12 @@ Dynamic fields groups for dynamic field widget. The key is the name of the group
 
 Ticket::Frontend::AgentTicketPrint###Widgets###0100-TicketInformation
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-
-            Printing information usually visible in the Ticket Information Widget for the Zoom View sidebar.
+Printing information usually visible in the Ticket Information Widget for the Zoom View sidebar.
         
-
 Ticket::Frontend::AgentTicketPrint###Widgets###0200-CustomerInformation
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-
-            Printing information usually visible in the Customer Information Widget for the Zoom View sidebar.
+Printing information usually visible in the Customer Information Widget for the Zoom View sidebar.
         
-
 Ticket::Frontend::AgentTicketPrint###DynamicFieldWidgetDisplay
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 Display settings to override defaults for dynamic field widget for Tickets.
