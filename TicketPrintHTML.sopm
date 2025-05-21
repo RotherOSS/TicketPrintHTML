@@ -14,5 +14,6 @@
         <File Permission="660" Location="Kernel/Output/HTML/Templates/Standard/AgentTicketPrint.tt" />
         <File Permission="660" Location="Kernel/Output/HTML/Templates/Standard/AgentTicketPrint/MIMEBase.tt" />
         <File Permission="660" Location="Kernel/Output/HTML/Templates/Standard/AgentTicketPrint/PrintStyles.tt" />
+        <File Permission="660" Location="scripts/docker-compose/seccomp_profile.json" />
     </Filelist>
 </otobo_package>
