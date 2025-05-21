@@ -28,9 +28,6 @@ use utf8;
 our $ObjectManagerDisabled = 1;
 
 # core modules
-use List::Util qw(any);
-use POSIX      qw(ceil);
-use File::stat qw(stat);
 
 # CPAN modules
 use PDF::API2 qw(open);
