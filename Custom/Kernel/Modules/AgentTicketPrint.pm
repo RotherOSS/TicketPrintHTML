@@ -1134,15 +1134,57 @@ sub _ArticleRender {
 
     my $ArticleStorage = $ConfigObject->Get('Ticket::Article::Backend::MIMEBase::ArticleStorage');
 
-    my $ArticleContent = $LayoutObject->ArticlePreview(
+    my $RichTextEnabled = $ConfigObject->Get('Ticket::Frontend::ZoomRichTextForce')
+        || $LayoutObject->{BrowserRichText}
+        || 0;
+
+    # Show HTML if RichText is enabled and HTML attachment isn't missing.
+    my $ShowHTML = $RichTextEnabled;
+
+    my $HTMLBodyAttachID = $Kernel::OM->Get('Kernel::Output::HTML::Article::MIMEBase')->HTMLBodyAttachmentIDGet(
         ArticleID           => $Article{ArticleID},
         TicketID            => $Article{TicketID},
-        ShowDeletedArticles => $ShowDeletedArticles ? 1 : 0,
-        VersionView         => $Self->{VersionView},
-        DeletedVersionID    => $DeletedVersionID, 
-        ArticleStorage      => $ArticleStorage,
-        SourceArticleID     => $Self->{SourceArticleID}
+        UserID              => $Self->{UserID},
     );
+    if ( $ShowHTML && !$HTMLBodyAttachID ) {
+        $ShowHTML = 0;
+    }
+
+    my $ArticleContent;
+    if ( $ShowHTML ) {
+        $ArticleContent = $LayoutObject->ArticlePreview(
+            ArticleID           => $Article{ArticleID},
+            TicketID            => $Article{TicketID},
+            ShowDeletedArticles => $ShowDeletedArticles ? 1 : 0,
+            VersionView         => $Self->{VersionView},
+            DeletedVersionID    => $DeletedVersionID,
+            ArticleStorage      => $ArticleStorage,
+            SourceArticleID     => $Self->{SourceArticleID},
+            ResultType          => 'html',
+        );
+
+    }
+    else {
+        $ArticleContent = $LayoutObject->ArticlePreview(
+            ArticleID           => $Article{ArticleID},
+            TicketID            => $Article{TicketID},
+            ShowDeletedArticles => $ShowDeletedArticles ? 1 : 0,
+            VersionView         => $Self->{VersionView},
+            DeletedVersionID    => $DeletedVersionID,
+            ArticleStorage      => $ArticleStorage,
+            SourceArticleID     => $Self->{SourceArticleID},
+            ResultType          => 'plain',
+        );
+
+        # html quoting
+        $ArticleContent = $LayoutObject->Ascii2Html(
+            NewLine        => $ConfigObject->Get('DefaultViewNewLine'),
+            Text           => $ArticleContent,
+            VMax           => $ConfigObject->Get('DefaultViewLines') || 5000,
+            HTMLResultMode => 1,
+            LinkFeature    => 1,
+        );
+    }
 
     if ( !$ArticleContent ) {
         $LogObject->Log(
