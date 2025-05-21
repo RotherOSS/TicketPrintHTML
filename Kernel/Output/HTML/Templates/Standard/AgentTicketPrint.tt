@@ -50,7 +50,7 @@
                 </div>
         [% RenderBlockStart("NextActivityDialogs") %]
                 <div class="LightRow Bottom">
-                    
+
             [% RenderBlockStart("NoActivityDialogs") %]
                     <span class="ActionMessage">[% Translate("There are no dialogs available at this point in the process.") | html %]</span>
             [% RenderBlockEnd("NoActivityDialogs") %]

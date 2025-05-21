@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<otobo_config version="2.0" init="Application">    
+<otobo_config version="2.0" init="Application">
     <Setting Name="Ticket::Frontend::AgentTicketPrint###DynamicFieldWidgetDisplay" UserPreferencesGroup="Advanced" UserModificationPossible="1" Required="0" Valid="1">
         <Description Translatable="1">Display settings to override defaults for dynamic field widget for Tickets.</Description>
         <Navigation>Frontend::Agent::View::TicketPrint</Navigation>
