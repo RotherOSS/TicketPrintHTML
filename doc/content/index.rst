@@ -27,6 +27,20 @@ The logo to be printed at the top of the page can be specified with : :ref:`Tick
 
 A complete list of options can be found in the :ref:`Ticket::Frontend::AgentTicketPrint###Configuration Reference`
 
+Setup
+-----
+
+For the print function to work properly, it is required that a headless Google Chrome browser is running.
+
+The package includes a file which is necessary to be in place. Please put the file 'scripts/docker-compose/seccomp_profile.json' in the directory where the docker-compose file of the OTOBO installation is located, e.g. to '/opt/otobo-docker/docker-compose/seccomp_profile.json'.
+
+After that, please edit the file '/opt/otobo-docker/docker-compose/otobo-base.yml' and insert the following two lines, directly below the line 'command: web':
+
+.. code:: 
+
+    security_opt:
+      - seccomp:seccomp_profile.json
+
 System requirements
 -------------------
 
