@@ -50,13 +50,13 @@ sub new {
 
     # get needed objects
     my $ParamObject  = $Kernel::OM->Get('Kernel::System::Web::Request');
-    
+
     $Self->{ArticleID} = $ParamObject->GetParam( Param => 'ArticleID' ) || '';
     $Self->{ArticleSort} = $ParamObject->GetParam( Param => 'ZoomExpandSort' ) || '';
     $Self->{VersionView}     = $ParamObject->GetParam( Param => 'VersionView' )     || '';
     $Self->{SourceArticleID} = $ParamObject->GetParam( Param => 'SourceArticleID' ) || '';
     $Self->{VersionID}       = $ParamObject->GetParam( Param => 'VersionID' )       || '';
-    
+
     return $Self;
 }
 
@@ -80,7 +80,7 @@ sub Run {
     my $DateTimeObject  = $Kernel::OM->Create('Kernel::System::DateTime');
     my $MainObject      = $Kernel::OM->Get('Kernel::System::Main');
     my $FileTempObject = $Kernel::OM->Get('Kernel::System::FileTemp');
-    
+
 
     $Self->{DisplaySettings} = $ConfigObject->Get('Ticket::Frontend::AgentTicketPrint');
 
@@ -158,7 +158,7 @@ sub Run {
         Suffix => '.html',
     );
     close($FileHandle);
-    
+
     $MainObject->FileWrite(
         Location    => $HTMLFilePath,
         Content     => \$HTML,
@@ -177,15 +177,15 @@ sub Run {
         );
         return $LayoutObject->ErrorScreen(
             Message => Translatable('PDF cannot be generated!'),
-            Comment => Translatable('Please contact the administrator.'),
+            Comment => Translatable('Please contact the administrator and check the log file for more information.'),
         );
     }
 
     # return the document as string
-    my $pdf = PDF::API2->open($PDFFilePath);
-    
-    my $PDFString = $pdf->stringify();
-    $pdf->end();
+    my $PDF = PDF::API2->open($PDFFilePath);
+
+    my $PDFString = $PDF->stringify();
+    $PDF->end();
 
     # assemble filename
     if ( $Self->{UserTimeZone} ) {
@@ -287,7 +287,7 @@ sub MaskAgentPrint {
 
     my $Limit = $ConfigObject->Get('PDF::MaxPages');
     my $Order = $Self->{ArticleSort} eq 'reverse' ? 'DESC' : 'ASC';
-    
+
     # get param object
     my $ParamObject = $Kernel::OM->Get('Kernel::System::Web::Request');
 
@@ -474,7 +474,6 @@ sub MaskAgentPrint {
         Data => { %Param, %Ticket, %AclAction },
     );
 
-    my %ActionLookup;
     my $UserObject = $Kernel::OM->Get('Kernel::System::User');
 
     # show created by if different then User ID 1
@@ -662,7 +661,7 @@ sub MaskAgentPrint {
                             Label => $IncludeField{Label},
                         }
                     );
-                    
+
                     if ( $IncludeDFConfig->{Link} ) {
                         $LayoutObject->Block(
                             Name => 'SetDynamicFieldLink',
@@ -1023,7 +1022,7 @@ sub _ArticleBoxGet {
 
 Returns article html.
 
-Implementation based on 
+Implementation based on
 Kernel::Output::HTML::TicketZoom::Agent::MIMEBase->ArticleRender() and
 Kernel::Modules::AgentTicketArticleContent->Run()
 
@@ -1050,7 +1049,7 @@ sub _ArticleRender {
     my $ConfigObject         = $Kernel::OM->Get('Kernel::Config');
     my $ArticleBaseObject = $Kernel::OM->Get('Kernel::Output::HTML::TicketZoom::Agent::Base');
     my $LogObject    = $Kernel::OM->Get('Kernel::System::Log');
-    
+
 # First part is based on Kernel::Output::HTML::TicketZoom::Agent::MIMEBase->ArticleRender()
 
     # Get article data.
@@ -1169,7 +1168,7 @@ sub _ArticleRender {
     if ( !$DeletedVersionID ) {
         %AtmBox = $ArticleBackendObject->ArticleAttachmentIndex(
             ArticleID       => $Article{ArticleID},
-            SourceArticleID => $Self->{SourceArticleID}, 
+            SourceArticleID => $Self->{SourceArticleID},
             VersionView     => $Self->{VersionView} || ''
         );
     }
@@ -1268,7 +1267,6 @@ sub _ArticleRender {
         }egxi;
     }
 
-
     my %Data = (
         Content            => $ArticleContent,
         ContentAlternative => '',
@@ -1305,9 +1303,9 @@ sub _ArticleRender {
     $ArticleContent = $Data{Content};
 
     # extract styles from articles
-    my @styles;
-    $ArticleContent =~ s/(<style[^<>]*>)(.*?)(<\/style>)/push @styles, [$1, $2, $3]; ""/gse;
-    my $CombinedStyles = join("\n", map { $_->[1] } @styles);
+    my @Styles;
+    $ArticleContent =~ s/(<style[^<>]*>)(.*?)(<\/style>)/push @Styles, [$1, $2, $3]; ""/gse;
+    my $CombinedStyles = join("\n", map { $_->[1] } @Styles);
 
     #remove meta tag
     $ArticleContent =~ s/<meta[^<>]*>//g;
@@ -1388,8 +1386,8 @@ sub _PrintPDF {
     my $FileTempObject = $Param{'FileTempObject'};
 
     my $HTMLFilePath = $Param{HTMLFilePath};
-    my ($FileHandle, $PDFFilePath) = $FileTempObject->TempFile( 
-        Suffix => '.pdf' 
+    my ($FileHandle, $PDFFilePath) = $FileTempObject->TempFile(
+        Suffix => '.pdf'
     );
     $FileHandle->close();
 
