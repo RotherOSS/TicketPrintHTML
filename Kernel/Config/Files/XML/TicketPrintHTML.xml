@@ -1,5 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <otobo_config version="2.0" init="Application">
+    <Setting Name="GoogleChrome::Bin" Required="0" Valid="1">
+        <Description Translatable="1">Defines the path to the Google Chrome or Chromium binary. If set, this binary will be used instead of PhantomJS::Bin.</Description>
+        <Navigation>Core::GoogleChrome</Navigation>
+        <Value>
+            <Item ValueRegex="" ValueType="File">/usr/bin/chromium</Item>
+        </Value>
+    </Setting>
     <Setting Name="Ticket::Frontend::AgentTicketPrint###DynamicFieldWidgetDisplay" UserPreferencesGroup="Advanced" UserModificationPossible="1" Required="0" Valid="1">
         <Description Translatable="1">Display settings to override defaults for dynamic field widget for Tickets.</Description>
         <Navigation>Frontend::Agent::View::TicketPrint</Navigation>
