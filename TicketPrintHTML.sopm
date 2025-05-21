@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <otobo_package version="0.1">
     <Name>TicketPrintHTML</Name>
-    <Version>11.0.0</Version>
+    <Version>0.0.0</Version>
     <Framework>11.0.x</Framework>
     <Vendor>Rother OSS GmbH</Vendor>
     <URL>https://otobo.io/</URL>
@@ -9,10 +9,10 @@
     <Description Lang="en">Print Tickets with advanced formatting, including images.</Description>
     <Description Lang="de">Ticket Druck mit verbesserter Formatierung inklusive Bildern.</Description>
     <Filelist>
-		<File Permission="660" Location="Kernel/Config/Files/XML/TicketPrintHTML.xml" />
-		<File Permission="660" Location="Custom/Kernel/Modules/AgentTicketPrint.pm" />
-		<File Permission="660" Location="Kernel/Output/HTML/Templates/Standard/AgentTicketPrint.tt"	/>
-		<File Permission="660" Location="Kernel/Output/HTML/Templates/Standard/AgentTicketPrint/MIMEBase.tt" />
-		<File Permission="660" Location="Kernel/Output/HTML/Templates/Standard/AgentTicketPrint/PrintStyles.tt" />
-	</Filelist>
+        <File Permission="660" Location="Kernel/Config/Files/XML/TicketPrintHTML.xml" />
+        <File Permission="660" Location="Custom/Kernel/Modules/AgentTicketPrint.pm" />
+        <File Permission="660" Location="Kernel/Output/HTML/Templates/Standard/AgentTicketPrint.tt" />
+        <File Permission="660" Location="Kernel/Output/HTML/Templates/Standard/AgentTicketPrint/MIMEBase.tt" />
+        <File Permission="660" Location="Kernel/Output/HTML/Templates/Standard/AgentTicketPrint/PrintStyles.tt" />
+    </Filelist>
 </otobo_package>
