@@ -51,29 +51,39 @@ Third-party software
 Configuration Reference
 -----------------------
 
-Frontend::Agent::View::TicketPrint
+Core::GoogleChrome
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+GoogleChrome::Bin
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+Defines the path to the Google Chrome or Chromium binary. If set, this binary will be used instead of PhantomJS::Bin.
+
+Frontend::Agent::View::TicketPrint
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 Ticket::Frontend::AgentTicketPrint###PrintLogoFile
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 Specifies the file for the logo in the page header encoded to base64 (700 x 100 pixel).
 
-Ticket::Frontend::AgentTicketPrint###DynamicFieldWidgetDisplay
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-Display settings to override defaults for dynamic field widget for Tickets.
-
 Ticket::Frontend::AgentTicketPrint###DynamicFieldWidgetDynamicFieldGroups
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 Dynamic fields groups for dynamic field widget. The key is the name of the group, the value contains the fields to be shown. Example: 'Key => My Group', 'Content: Name_X, NameY'.
 
-Ticket::Frontend::AgentTicketPrint###Widgets###0200-CustomerInformation
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-Printing information usually visible in the Customer Information Widget for the Zoom View side bar.
-
 Ticket::Frontend::AgentTicketPrint###Widgets###0100-TicketInformation
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-Printing information usually visible in the Ticket Information Widget for the Zoom View side bar.
+
+            Printing information usually visible in the Ticket Information Widget for the Zoom View sidebar.
+        
+
+Ticket::Frontend::AgentTicketPrint###Widgets###0200-CustomerInformation
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+            Printing information usually visible in the Customer Information Widget for the Zoom View sidebar.
+        
+
+Ticket::Frontend::AgentTicketPrint###DynamicFieldWidgetDisplay
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+Display settings to override defaults for dynamic field widget for Tickets.
 
 About
 =======
