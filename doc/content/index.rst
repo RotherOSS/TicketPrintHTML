@@ -41,6 +41,8 @@ After that, please edit the file '/opt/otobo-docker/docker-compose/otobo-base.ym
     security_opt:
       - seccomp:seccomp_profile.json
 
+Following this, please restart the containers by executing 'docker-compose restart'.
+
 System requirements
 -------------------
 
