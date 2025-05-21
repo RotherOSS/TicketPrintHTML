@@ -1311,15 +1311,15 @@ sub _ArticleRender {
         TemplateFile => 'AgentTicketPrint/MIMEBase',
         Data         => {
             %Article,
-            ArticleFields => \%ArticleFields,
+            ArticleFields        => \%ArticleFields,
             CommunicationChannel => $CommunicationChannel{DisplayName},
-            Crypt => \%Flags,
-            ArticleMetaFields => \%ArticleMetaFields,
-            SenderImage => $SenderImage,
-            SenderInitials => $SenderInitials,
-            HTML => $ArticleContent,
-            Styles => $CombinedStyles,
-            ArticleModuleMeta => \@ArticleModuleMeta
+            Crypt                => \%Flags,
+            ArticleMetaFields    => \%ArticleMetaFields,
+            SenderImage          => $SenderImage,
+            SenderInitials       => $SenderInitials,
+            HTML                 => $ArticleContent,
+            Styles               => $CombinedStyles,
+            ArticleModuleMeta    => \@ArticleModuleMeta
         },
     )
 }
@@ -1394,7 +1394,7 @@ sub _PrintPDF {
             Priority => 'error',
             Message  => "Google Chrome path not configured!",
         );
-        return 0;
+        return;
     }
 
     my $CommandResult = `'$ChromePath' --no-sandbox --aggressive-cache-discard --headless --print-to-pdf='$PDFFilePath' --no-pdf-header-footer --virtual-time-budget=25000 '$HTMLFilePath' 2>&1`;
