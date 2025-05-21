@@ -166,6 +166,16 @@ sub Run {
         HTMLFilePath     => $HTMLFilePath,
     );
 
+    # check if we got a result
+    if (!$PDFFilePath) {
+
+        # error likely stems from chrome path not being configured and was logged earlier in this case
+        return $LayoutObject->ErrorScreen(
+            Message => Translatable('PDF cannot be generated!'),
+            Comment => Translatable('Please contact the administrator and check the log file for more information.'),
+        );
+    }
+
     # check if file exists
     if ( !-e $PDFFilePath ) {
         $Kernel::OM->Get('Kernel::System::Log')->Log(
