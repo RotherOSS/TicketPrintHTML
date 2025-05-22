@@ -36,10 +36,19 @@ If running in docker, it is necessary for a file which the package includes to b
 
 After that, please edit the file ``/opt/otobo-docker/docker-compose/otobo-base.yml`` and insert the following two lines, directly below the line ``command: web``:
 
-.. code-block:: yaml
+.. code-block:: diff
 
-    security_opt:
-      - seccomp:seccomp_profile.json
+     # The HTTP port might be specified in a docker-compose extension file, e.g. docker-compose/otobo-override-http.yml.
+     # For HTTPS no HTTP port is exposed.
+     #ports:
+     #    - "80:5000"
+     volumes:
+       - opt_otobo:/opt/otobo
+     command: web
+    +security_opt:
+    +  - seccomp:seccomp_profile.json
+     healthcheck:
+       test: curl -s -f http://localhost:5000/robots.txt
 
 Following this, please restart the containers by executing ``docker-compose restart``.
 
