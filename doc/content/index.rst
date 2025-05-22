@@ -32,16 +32,16 @@ Setup
 
 For the print function to work properly, it is required that a headless Google Chrome browser is running.
 
-The package includes a file which is necessary to be in place. Please put the file 'scripts/docker-compose/seccomp_profile.json' in the directory where the docker-compose file of the OTOBO installation is located, e.g. to '/opt/otobo-docker/docker-compose/seccomp_profile.json'.
+If running in docker, it is necessary for a file which the package includes to be in place. Please put the file ``scripts/docker-compose/seccomp_profile.json`` in the directory where the docker-compose file of the OTOBO installation is located, e.g. to ``/opt/otobo-docker/docker-compose/seccomp_profile.json``.
 
-After that, please edit the file '/opt/otobo-docker/docker-compose/otobo-base.yml' and insert the following two lines, directly below the line 'command: web':
+After that, please edit the file ``/opt/otobo-docker/docker-compose/otobo-base.yml`` and insert the following two lines, directly below the line ``command: web``:
 
-.. code:: 
+.. code-block:: yaml
 
     security_opt:
       - seccomp:seccomp_profile.json
 
-Following this, please restart the containers by executing 'docker-compose restart'.
+Following this, please restart the containers by executing ``docker-compose restart``.
 
 System requirements
 -------------------
