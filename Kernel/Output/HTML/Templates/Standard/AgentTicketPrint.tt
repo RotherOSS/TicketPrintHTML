@@ -71,11 +71,11 @@
                                     [% Data.Label | html %]:
                                 </label>
                                 <p class="Value CutValue DynamicField_[% Data.Name %]">
-<!-- OutputFilterHook_WidgetDynamicFieldBegin -->
+                    <!-- OutputFilterHook_WidgetDynamicFieldBegin -->
                     [% RenderBlockStart("OverviewWidgetDynamicFieldPlain") %]
                                     [% Data.Value %]
                     [% RenderBlockEnd("OverviewWidgetDynamicFieldPlain") %]
-<!-- OutputFilterHook_WidgetDynamicFieldEnd -->
+                    <!-- OutputFilterHook_WidgetDynamicFieldEnd -->
                                 </p>
                                 <p class="ValueLong">
                     [% RenderBlockStart("OverviewWidgetDynamicFieldValueLong") %]
@@ -97,11 +97,11 @@
                                             [% Data.Label | html %]
                                         </label>
                                         <p class="Value CutValue DynamicField_[% Data.Name %]">
-<!-- OutputFilterHook_SetDynamicFieldBegin -->
+                        <!-- OutputFilterHook_SetDynamicFieldBegin -->
                         [% RenderBlockStart("SetDynamicFieldPlain") %]
                                             [% Data.Value %]
                         [% RenderBlockEnd("SetDynamicFieldPlain") %]
-<!-- OutputFilterHook_SetDynamicFieldEnd -->
+                        <!-- OutputFilterHook_SetDynamicFieldEnd -->
                                         </p>
                                         <p class="ValueLong">
                         [% RenderBlockStart("SetDynamicFieldValueLong") %]

@@ -161,6 +161,9 @@ sub Run {
         Content     => \$HTML,
     );
 
+    # DEBUG
+    return $HTML;
+
     my $PDFFilePath = $Self->_PrintPDF(
         FileTempObject   => $FileTempObject,
         HTMLFilePath     => $HTMLFilePath,
@@ -1031,7 +1034,7 @@ Returns article html.
 
 Implementation based on
 Kernel::Output::HTML::TicketZoom::Agent::MIMEBase->ArticleRender() and
-Kernel::Modules::AgentTicketArticleContent->Run()
+Kernel::Modules::4->Run()
 
 Result:
     $HTML = "<div>...</div>";
@@ -1211,7 +1214,7 @@ sub _ArticleRender {
             . ";TicketID=$Article{TicketID};ArticleID=$Article{ArticleID};VersionView=0;SourceArticleID=$DeletedVersionID;ArticleDeleted=$DeletedVersionID;FileID=";
     }
 
-    # replace links to inline images in html content
+    
     my %AtmBox;
 
     if ( !$DeletedVersionID ) {

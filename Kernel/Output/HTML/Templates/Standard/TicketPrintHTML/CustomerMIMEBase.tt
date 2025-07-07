@@ -1,0 +1,45 @@
+# --
+# OTOBO is a web-based ticketing system for service organisations.
+# --
+# Copyright (C) 2001-2020 OTRS AG, https://otrs.com/
+# Copyright (C) 2019-2025 Rother OSS GmbH, https://otobo.io/
+# --
+# $origin: otobo - cb7519b61706979a7ebe46a54a9d710b64427662 - Kernel/Output/HTML/Templates/Standard/AgentTicketZoom/ArticleRender/MIMEBase.tt
+# --
+# This program is free software: you can redistribute it and/or modify it under
+# the terms of the GNU General Public License as published by the Free Software
+# Foundation, either version 3 of the License, or (at your option) any later version.
+# This program is distributed in the hope that it will be useful, but WITHOUT
+# ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+# FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+# You should have received a copy of the GNU General Public License
+# along with this program. If not, see <https://www.gnu.org/licenses/>.
+# --
+## nofilter(TidyAll::Plugin::OTOBO::TT::ScriptUsage)
+
+<div class="WidgetSimple Expanded [% Data.SenderType | html %] [% IF Data.SenderType == 'customer' %]Incoming[% ELSE %]Outgoing[% END %]">
+    <div class="Header">
+        <h2>
+            [% Translate("#%s", Data.ArticleNumber) | html %] &ndash; [% Data.ArticleFields.Subject.Value | truncate(100) | html %]
+            &ndash; <span class="[% Data.ArticleFields.Sender.ValueHidden | html %]">[% Data.ArticleFields.Sender.Value | html %]</span> <span class="[% Data.ArticleFields.Sender.RealnameHidden | html %]">[% Data.ArticleFields.Sender.Realname | html %]</span>
+            &ndash; <span title="[% Translate("Created") | html %]: [% Data.CreateTime | Localize("TimeShort") %]">[% Data.CreateTime | Localize("TimeShort") %]</span>
+        </h2>
+    </div>
+
+    <div class="Content">
+        <template shadowrootmode="closed">
+            [% IF Data.ArticleContent %]
+                <style>
+                    [% Data.Styles %]
+                    .ck-content #templateContainer td.bodyContent > h1 {
+                        background-color: #fff !important;
+                        color: #00023c !important;
+                    }
+                </style>
+                <div class="ck-content">
+                    [% Data.ArticleContent %]
+                </div>
+            [% END %]
+        </template>
+    </div>
+</div>
