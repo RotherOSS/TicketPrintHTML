@@ -7,24 +7,6 @@
             <Item ValueRegex="" ValueType="File">/usr/bin/chromium</Item>
         </Value>
     </Setting>
-    <Setting Name="Ticket::Frontend::AgentTicketPrint###DynamicFieldWidgetDisplay" UserPreferencesGroup="Advanced" UserModificationPossible="1" Required="0" Valid="1">
-        <Description Translatable="1">Display settings to override defaults for dynamic field widget for Tickets.</Description>
-        <Navigation>Frontend::Agent::View::TicketPrint</Navigation>
-        <Value>
-            <Hash>
-                <Item Key="NavBarName" Translatable="1">Dynamic Fields</Item>
-                <Item Key="WidgetTitle" Translatable="1">Dynamic Field Information</Item>
-            </Hash>
-        </Value>
-    </Setting>
-    <Setting Name="Ticket::Frontend::AgentTicketPrint###DynamicFieldWidgetDynamicFieldGroups" Required="0" Valid="0">
-        <Description Translatable="1">Dynamic fields groups for dynamic field widget. The key is the name of the group, the value contains the fields to be shown. Example: 'Key =&gt; My Group', 'Content: Name_X, NameY'.</Description>
-        <Navigation>Frontend::Agent::View::TicketPrint</Navigation>
-        <Value>
-            <Hash>
-            </Hash>
-        </Value>
-    </Setting>
     <Setting Name="Ticket::Frontend::AgentTicketPrint###PrintLogoFile" Required="1" Valid="1">
         <Description Translatable="1">Specifies the file for the logo in the page header encoded to base64 (700 x 100 pixel).</Description>
         <Navigation>Frontend::Agent::View::TicketPrint</Navigation>
