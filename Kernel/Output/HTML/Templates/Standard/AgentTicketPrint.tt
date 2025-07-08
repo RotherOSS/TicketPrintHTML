@@ -43,7 +43,9 @@
     [% FOREACH Widget IN Data.Widgets; %]
             [% Widget.Output %]
     [% END; %]
+[% RenderBlockEnd("Header") %]
 
+        <div id="ArticleItems">
 [% RenderBlockStart("HintNoArticles") %]
             <div class="WidgetSimple">
                 <div class="Content">
@@ -51,22 +53,8 @@
                 </div>
             </div>
 [% RenderBlockEnd("HintNoArticles") %]
-
-            <div id="ArticleItems">
-                [% Data.ArticleItems %]
-            </div>
-
-    [% FOREACH Widget IN Data.MainWidgets; %]
-        [% IF Widget.Async; %]
-            <div id="[% Widget.ElementID %]"></div>
-        [% ELSE; %]
-            [% Widget.Output %]
-        [% END; %]
-    [% END; %]
+            [% Data.ArticleItems %]
         </div>
-[% RenderBlockEnd("Header") %]
-
-        [% Data.ArticleWidgetsHTML %]
 
         <script type="text/javascript">
         //<![CDATA[

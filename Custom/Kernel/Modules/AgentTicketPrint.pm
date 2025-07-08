@@ -308,6 +308,20 @@ sub _CreateHTMLContent {
     # set display options
     $Param{Hook} = $ConfigObject->Get('Ticket::Hook') || 'Ticket#';
 
+    # number of articles
+    $Param{ArticleCount} = scalar @ArticleBox;
+
+    # print logo
+    $Param{PDFLogo} = '';
+    if ( $Self->{DisplaySettings}{PrintLogoFile} ) {
+        $Param{PDFLogo} = $Self->{DisplaySettings}{PrintLogoFile};
+    }
+
+    $LayoutObject->Block(
+        Name => 'Header',
+        Data => { %Param, %Ticket },
+    );
+
     my @ArticleIDs;
     my $ArticleWidgetsHTML = '';
 
@@ -323,39 +337,7 @@ sub _CreateHTMLContent {
         push @ArticleIDs, $Article->{ArticleID};
     }
 
-    $Param{ArticleItems}  = '';
-    $Param{ArticleItems} .= $LayoutObject->Output(
-        TemplateFile => 'AgentTicketPrint',
-        Data         => {
-            %Ticket,
-            ArticleWidgetsHTML => $ArticleWidgetsHTML,
-        },
-    );
-
-    # number of articles
-    $Param{ArticleCount} = scalar @ArticleBox;
-
-    # print logo
-    $Param{PDFLogo} = '';
-    if ( $Self->{DisplaySettings}{PrintLogoFile} ) {
-        $Param{PDFLogo} = $Self->{DisplaySettings}{PrintLogoFile};
-    }
-
-    $LayoutObject->Block(
-        Name => 'Header',
-        Data => { %Param, %Ticket },
-    );
-
-    # show created by if different then User ID 1
-    if ( $Ticket{CreateBy} > 1 ) {
-
-        $Ticket{CreatedByUser} = $Kernel::OM->Get('Kernel::System::User')->UserName( UserID => $Ticket{CreateBy} );
-
-        $LayoutObject->Block(
-            Name => 'CreatedBy',
-            Data => {%Ticket},
-        );
-    }
+    $Param{ArticleItems} = $ArticleWidgetsHTML;
 
     # show no articles block if ticket does not contain articles
     if ( !@ArticleBox ) {
