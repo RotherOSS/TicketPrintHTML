@@ -69,20 +69,17 @@ sub Run {
     }
 
     # get needed objects
-    my $TicketObject    = $Kernel::OM->Get('Kernel::System::Ticket');
-    my $ConfigObject    = $Kernel::OM->Get('Kernel::Config');
-    my $DateTimeObject  = $Kernel::OM->Create('Kernel::System::DateTime');
-    my $MainObject      = $Kernel::OM->Get('Kernel::System::Main');
+    my $TicketObject   = $Kernel::OM->Get('Kernel::System::Ticket');
+    my $ConfigObject   = $Kernel::OM->Get('Kernel::Config');
+    my $DateTimeObject = $Kernel::OM->Create('Kernel::System::DateTime');
+    my $MainObject     = $Kernel::OM->Get('Kernel::System::Main');
     my $FileTempObject = $Kernel::OM->Get('Kernel::System::FileTemp');
-
-
-    $Self->{DisplaySettings} = $ConfigObject->Get('Ticket::Frontend::AgentTicketPrint');
 
     # check permissions
     my $Access = $TicketObject->TicketPermission(
         Type     => 'ro',
         TicketID => $Self->{TicketID},
-        UserID   => $Self->{UserID}
+        UserID   => $Self->{UserID},
     );
 
     # error screen, don't print ticket
@@ -93,25 +90,8 @@ sub Run {
         WithHeader => 'no',
     ) if !$Access;
 
-    # get ticket attributes
-    my %Ticket = $TicketObject->TicketGet(
-        TicketID      => $Self->{TicketID},
-        DynamicFields => 1,
-    );
-
-    my %PossibleActions;
-    my $Counter = 0;
-
-    # get all registered Actions
-    if ( ref $ConfigObject->Get('Frontend::Module') eq 'HASH' ) {
-
-        my %Actions = %{ $ConfigObject->Get('Frontend::Module') };
-
-        # only use those Actions that stats with Agent
-        %PossibleActions = map { ++$Counter => $_ }
-            grep { substr( $_, 0, length 'Agent' ) eq 'Agent' }
-            sort keys %Actions;
-    }
+    # Get ACL restrictions.
+    my %PossibleActions = ( 1 => $Self->{Action} );
 
     my $ACL = $TicketObject->TicketAcl(
         Data          => \%PossibleActions,
@@ -122,10 +102,7 @@ sub Run {
         UserID        => $Self->{UserID},
     );
 
-    my %AclAction = %PossibleActions;
-    if ($ACL) {
-        %AclAction = $TicketObject->TicketAclActionData();
-    }
+    my %AclAction = $ACL ? $TicketObject->TicketAclActionData() : %PossibleActions;
 
     # check if ACL restrictions exist
     my %AclActionLookup = reverse %AclAction;
@@ -134,6 +111,12 @@ sub Run {
     if ( !$AclActionLookup{ $Self->{Action} } ) {
         return $LayoutObject->NoPermission( WithHeader => 'no' );
     }
+
+    # get ticket attributes
+    my %Ticket = $TicketObject->TicketGet(
+        TicketID      => $Self->{TicketID},
+        DynamicFields => 1,
+    );
 
     my $HTML = $Self->_CreateHTMLContent(
         Ticket => \%Ticket,
@@ -226,6 +209,8 @@ sub _CreateHTMLContent {
     my $ConfigObject  = $Kernel::OM->Get('Kernel::Config');
     my $MainObject    = $Kernel::OM->Get('Kernel::System::Main');
 
+    my $DisplaySettings = $ConfigObject->Get('Ticket::Frontend::AgentTicketPrint') // {};
+
     # Create a list of article sender types for lookup
     my %ArticleSenderTypeList = $ArticleObject->ArticleSenderTypeList();
 
@@ -241,7 +226,6 @@ sub _CreateHTMLContent {
     my @ArticleBox = $ArticleObject->ArticleList(
         TicketID             => $Self->{TicketID},
         IsVisibleForCustomer => $IsVisibleForCustomer,
-        ShowDeletedArticles  => 0,
     );
 
     if ( IsArrayRefWithData( $Self->{ArticleFilter}->{CommunicationChannelID} ) ) {
@@ -286,8 +270,8 @@ sub _CreateHTMLContent {
 
     my @Widgets;
     WIDGET:
-    for my $Key ( sort keys %{ $Self->{DisplaySettings}->{Widgets} // {} } ) {
-        my $Config = $Self->{DisplaySettings}->{Widgets}->{$Key};
+    for my $Key ( sort keys %{ $DisplaySettings->{Widgets} // {} } ) {
+        my $Config = $DisplaySettings->{Widgets}->{$Key};
 
         my $Success = eval { $MainObject->Require( $Config->{Module} ) };
 
@@ -327,8 +311,8 @@ sub _CreateHTMLContent {
 
     # print logo
     $Param{PDFLogo} = '';
-    if ( $Self->{DisplaySettings}{PrintLogoFile} ) {
-        $Param{PDFLogo} = $Self->{DisplaySettings}{PrintLogoFile};
+    if ( $DisplaySettings->{PrintLogoFile} ) {
+        $Param{PDFLogo} = $DisplaySettings->{PrintLogoFile};
     }
 
     $LayoutObject->Block(
@@ -461,7 +445,6 @@ sub _ArticleRender {
             ArticleID           => $Article{ArticleID},
             TicketID            => $Article{TicketID},
             ShowDeletedArticles => 0,
-            VersionView         => $Self->{VersionView},
             ArticleStorage      => $ArticleStorage,
             SourceArticleID     => $Self->{SourceArticleID},
             ResultType          => 'html',
@@ -473,7 +456,6 @@ sub _ArticleRender {
             ArticleID           => $Article{ArticleID},
             TicketID            => $Article{TicketID},
             ShowDeletedArticles => 0,
-            VersionView         => $Self->{VersionView},
             ArticleStorage      => $ArticleStorage,
             SourceArticleID     => $Self->{SourceArticleID},
             ResultType          => 'plain',
@@ -514,7 +496,6 @@ sub _ArticleRender {
     my %AtmBox = $ArticleBackendObject->ArticleAttachmentIndex(
         ArticleID       => $Article{ArticleID},
         SourceArticleID => $Self->{SourceArticleID},
-        VersionView     => $Self->{VersionView} || ''
     );
 
     # Do not load external images if 'BlockLoadingRemoteContent' is enabled.
@@ -647,7 +628,7 @@ sub _ArticleRender {
     $ArticleContent =~ s/<meta[^<>]*>//g;
 
     return $LayoutObject->Output(
-        TemplateFile => 'AgentTicketPrint/MIMEBase',
+        TemplateFile => 'TicketPrintHTML/MIMEBase',
         Data         => {
             %Article,
             ArticleFields        => \%ArticleFields,

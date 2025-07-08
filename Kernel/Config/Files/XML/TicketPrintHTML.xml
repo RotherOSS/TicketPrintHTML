@@ -34,4 +34,11 @@
             </Hash>
         </Value>
     </Setting>
+    <Setting Name="Ticket::Frontend::CustomerTicketPrint###TicketInformation" Required="0" Valid="1">
+        <Description Translatable="1">Printing information usually visible in the Customer Information Widget for the Zoom View sidebar.</Description>
+        <Navigation>Frontend::Customer::View::TicketPrint</Navigation>
+        <Value>
+            <Item ValueType="Checkbox">1</Item>
+        </Value>
+    </Setting>
 </otobo_config>

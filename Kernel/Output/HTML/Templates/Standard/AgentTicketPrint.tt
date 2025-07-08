@@ -24,7 +24,7 @@
         <meta id="viewport" name="viewport" content="">
         <meta name="robots" content="noindex,nofollow" />
 
-        [% InsertTemplate("AgentTicketPrint/PrintStyles.tt") %]
+        [% InsertTemplate("TicketPrintHTML/PrintStyles.tt") %]
 
         <title>[% Data.TitleArea | html %][% Config("ProductName") %]</title>
     </head>
@@ -57,38 +57,38 @@
         </div>
 
         <script type="text/javascript">
-        //<![CDATA[
-            "use strict";
+            //<![CDATA[
+                "use strict";
 
-            Core.Init.ExecuteInit('JS_LOADED');
+                Core.Init.ExecuteInit('JS_LOADED');
 
-            Core.App.Ready(function () {
+                Core.App.Ready(function () {
 
-                Core.Init.ExecuteInit('DOCUMENT_READY');
+                    Core.Init.ExecuteInit('DOCUMENT_READY');
 
-                [% PROCESS JSDataInsert %]
+                    [% PROCESS JSDataInsert %]
 
-                Core.Init.ExecuteInit('CONFIG_LOADED');
-                Core.Init.ExecuteInit('APP_GLOBAL_EARLY');
-                Core.Init.ExecuteInit('APP_GLOBAL');
-                Core.Init.ExecuteInit('APP_GLOBAL_LATE');
+                    Core.Init.ExecuteInit('CONFIG_LOADED');
+                    Core.Init.ExecuteInit('APP_GLOBAL_EARLY');
+                    Core.Init.ExecuteInit('APP_GLOBAL');
+                    Core.Init.ExecuteInit('APP_GLOBAL_LATE');
 
-            });
-        //]]>
+                });
+            //]]>
         </script>
 
         <script type="text/javascript">
-        //<![CDATA[
-            "use strict";
-            Core.App.Ready(function () {
-                Core.Init.ExecuteInit('APP_MODULE_EARLY');
+            //<![CDATA[
+                "use strict";
+                Core.App.Ready(function () {
+                    Core.Init.ExecuteInit('APP_MODULE_EARLY');
 
-                [% PROCESS JSOnDocumentCompleteInsert %]
+                    [% PROCESS JSOnDocumentCompleteInsert %]
 
-                Core.Init.ExecuteInit('APP_MODULE');
-                Core.Init.ExecuteInit('APP_MODULE_LATE');
-            });
-        //]]>
+                    Core.Init.ExecuteInit('APP_MODULE');
+                    Core.Init.ExecuteInit('APP_MODULE_LATE');
+                });
+            //]]>
         </script>
 
     </body>

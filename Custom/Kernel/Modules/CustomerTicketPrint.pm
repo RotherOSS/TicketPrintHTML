@@ -24,12 +24,12 @@ our $ObjectManagerDisabled = 1;
 
 # core modules
 
+# CPAN modules
+use PDF::API2 qw(open);
+
 # OTOBO modules
 use Kernel::System::VariableCheck qw(:all);
 use Kernel::Language              qw(Translatable);
-
-# CPAN modules
-use PDF::API2 qw(open);
 
 sub new {
     my ( $Type, %Param ) = @_;
@@ -51,36 +51,25 @@ sub new {
 sub Run {
     my ( $Self, %Param ) = @_;
 
+    # get layout object
     my $LayoutObject = $Kernel::OM->Get('Kernel::Output::HTML::Layout');
-    my $ConfigObject = $Kernel::OM->Get('Kernel::Config');
-    my $ParamObject  = $Kernel::OM->Get('Kernel::System::Web::Request');
-    my $TicketObject  = $Kernel::OM->Get('Kernel::System::Ticket');
-    my $ArticleObject = $Kernel::OM->Get('Kernel::System::Ticket::Article');
-    my $FileTempObject = $Kernel::OM->Get('Kernel::System::FileTemp');
-    my $MainObject = $Kernel::OM->Get('Kernel::System::Main');
 
-    my $DateTimeObject  = $Kernel::OM->Create('Kernel::System::DateTime');
-
-    # Check needed stuff.
-    my $message = '';
+    # check needed stuff
     if ( !$Self->{TicketID} ) {
-        $message = Translatable('Need TicketID!');
-    } elsif ( !$Self->{UserCustomerID} ) {
-        $message = Translatable('Need CustomerID!');
-    }
-    if ($message ne '') {
-        my $Output = $LayoutObject->CustomerHeader(
-            Title => Translatable('Error'),
+        return $LayoutObject->ErrorScreen(
+            Message => Translatable('No TicketID is given!'),
+            Comment => Translatable('Please contact the administrator.'),
         );
-        $Output .= $LayoutObject->CustomerError(
-            Message => $message
-        );
-        $Output .= $LayoutObject->CustomerFooter();
-
-        return $Output;
     }
 
-    # Check permissions.
+    # get needed objects
+    my $TicketObject   = $Kernel::OM->Get('Kernel::System::Ticket');
+    my $ConfigObject   = $Kernel::OM->Get('Kernel::Config');
+    my $DateTimeObject = $Kernel::OM->Create('Kernel::System::DateTime');
+    my $MainObject     = $Kernel::OM->Get('Kernel::System::Main');
+    my $FileTempObject = $Kernel::OM->Get('Kernel::System::FileTemp');
+
+    # check permissions
     my $Access = $TicketObject->TicketCustomerPermission(
         Type     => 'ro',
         TicketID => $Self->{TicketID},
@@ -88,7 +77,7 @@ sub Run {
     );
 
     # No permission, do not show ticket.
-    return $LayoutObject->CustomerNoPermission( WithHeader => 'yes' ) if !$Access;
+    return $LayoutObject->CustomerNoPermission( WithHeader => 'no' ) if !$Access;
 
     # Get ACL restrictions.
     my %PossibleActions = ( 1 => $Self->{Action} );
@@ -101,31 +90,28 @@ sub Run {
         ReturnSubType  => '-',
         CustomerUserID => $Self->{UserID},
     );
-    my %AclAction = $TicketObject->TicketAclActionData();
 
-    # Check if ACL restrictions exist.
-    if ($ACL) {
+    my %AclAction = %PossibleActions;
 
-        my %AclActionLookup = reverse %AclAction;
+    # check if ACL restrictions exist
+    my %AclActionLookup = reverse %AclAction;
 
-        # Show error screen if ACL prohibits this action.
-        if ( !$AclActionLookup{ $Self->{Action} } ) {
-            return $LayoutObject->CustomerNoPermission( WithHeader => 'yes' );
-        }
+    # show error screen if ACL prohibits this action
+    if ( !$AclActionLookup{ $Self->{Action} } ) {
+        return $LayoutObject->CustomerNoPermission( WithHeader => 'no' );
     }
 
-    # Get ticket data.
+    # get ticket attributes
     my %Ticket = $TicketObject->TicketGet(
         TicketID      => $Self->{TicketID},
-        DynamicFields => 0,
+        DynamicFields => 1,
     );
 
-    my $HTMLString = $Self->_CreateHTMLContent(
-        TicketID => $Self->{TicketID},
-        UserID   => $Self->{UserID},
+    my $HTML = $Self->_CreateHTMLContent(
+        Ticket => \%Ticket,
     );
 
-   my $HTMLFileDirectory = $FileTempObject->TempDir();
+    my $HTMLFileDirectory = $FileTempObject->TempDir();
 
     my ($FileHandle, $HTMLFilePath) = $FileTempObject->TempFile(
         Suffix => '.html',
@@ -134,15 +120,8 @@ sub Run {
 
     $MainObject->FileWrite(
         Location    => $HTMLFilePath,
-        Content     => \$HTMLString,
+        Content     => \$HTML,
     );
-
-    #DEBUG
-    $MainObject->FileWrite(
-        Location    => './DEBUG.html',
-        Content     => \$HTMLString,
-    );
-    return $HTMLString;
 
     my $PDFFilePath = $Self->_PrintPDF(
         FileTempObject   => $FileTempObject,
@@ -201,269 +180,8 @@ sub Run {
 sub _CreateHTMLContent {
     my ( $Self, %Param ) = @_;
 
-    # TODO: REMOVE TEST CODE
-    #return '<html><head></head><body><h1>Test PDF Content</h1></body></html>';
-
-    # Check needed params.
-    for my $Needed (qw(TicketID UserID)) {
-        if ( !$Param{$Needed} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
-                Priority => "error",
-                Message  => "Need $Needed!"
-            );
-            return;
-        }
-    }
-
-    my $ConfigObject = $Kernel::OM->Get('Kernel::Config');
-    my $LayoutObject = $Kernel::OM->Get('Kernel::Output::HTML::Layout');
-    my $LinkObject   = $Kernel::OM->Get('Kernel::System::LinkObject');
-
-    # Get ticket content.
-    my $TicketObject = $Kernel::OM->Get('Kernel::System::Ticket');
-    my %Ticket       = $TicketObject->TicketGet(
-        TicketID      => $Param{TicketID},
-        DynamicFields => 0,
-        UserID        => $Param{UserID},
-    );
-
-    
-    my $Config = $ConfigObject->Get("Ticket::Frontend::CustomerTicketZoom");
-    my $DisplaySettings = $ConfigObject->Get("Ticket::Frontend::CustomerTicketPrint");
-
-    # Create Ticket Info Blocks
-
-    $LayoutObject->Block(
-        Name => 'InformationWidget',
-        Data => {
-            WidgetID => 'TicketInformationWidget',
-            WidgetTitle => 'Ticket Information',
-        },
-    );
-
-    $LayoutObject->Block(
-        Name => 'InformationWidgetField',
-        Data => {
-            Label   => "CustomerID",
-            Value => $Ticket{CustomerID} || '-'
-        },
-    );
-
-    $LayoutObject->Block(
-        Name => 'InformationWidgetField',
-        Data => {
-            Label   => 'Age',
-            Value => $Ticket{Age} || '-',
-        },
-    );
-
-    my $CreatedAt = $LayoutObject->{LanguageObject}->FormatTimeString(
-        $Ticket{Created},
-        'DateFormat',
-    );
-
-    $LayoutObject->Block(
-        Name => 'InformationWidgetField',
-        Data => {
-            Label   => 'Created',
-            Value => $CreatedAt || '-',
-        },
-    );
-
-    # Add ticket data, respecting AttributesView configuration for customer interface.
-    my @Attributes = qw(
-        State Priority Queue Lock CustomerID Owner
-    );
-    if ( $ConfigObject->Get('Ticket::Responsible') ) {
-        push @Attributes, 'Responsible';
-    }
-    if ( $ConfigObject->Get('Ticket::Type') ) {
-        push @Attributes, 'Responsible';
-    }
-    if ( $ConfigObject->Get('Ticket::Service') ) {
-        push @Attributes, 'Service';
-        push @Attributes, 'SLA';
-    }
-
-    for my $Attribute (@Attributes) {
-        if ( $Config->{AttributesView}->{$Attribute} ) {
-            $LayoutObject->Block(
-                Name => 'InformationWidgetField',
-                Data => {
-                    Label   => $Attribute,
-                    Value   => $Ticket{$Attribute} || '-',
-                },
-            );
-        }
-    }
-
-    # Create Customer Info Block if configured.
-
-    if ($ConfigObject->Get('Ticket::Frontend::CustomerTicketPrint')->{CustomerInformation}) {
-
-        # Get customer info.
-        my $CustomerUserObject = $Kernel::OM->Get('Kernel::System::CustomerUser');
-        my %CustomerData;
-        if ( $Ticket{CustomerUserID} ) {
-            %CustomerData = $CustomerUserObject->CustomerUserDataGet(
-                User => $Ticket{CustomerUserID},
-            );
-        }
-        elsif ( $Ticket{CustomerID} ) {
-            %CustomerData = $CustomerUserObject->CustomerUserDataGet(
-                CustomerID => $Ticket{CustomerID},
-            );
-        }
-
-        my $Map = $CustomerData{Config}->{Map};
-
-        # Check if customer company support is enabled.
-        if ( $CustomerData{Config}->{CustomerCompanySupport} ) {
-            my $Map2 = $CustomerData{CompanyConfig}->{Map};
-            if ($Map2) {
-                push( @{$Map}, @{$Map2} );
-            }
-        }
-
-        my @CustomerInfoFields;
-        for my $Field ( @{$Map} ) {
-            if ( ${$Field}[3] && $CustomerData{ ${$Field}[0] } ) {
-                my %PrintableField;
-                $PrintableField{Label} = ${$Field}[1];
-                $PrintableField{Value} = $CustomerData{ ${$Field}[0] };
-                push @CustomerInfoFields, \%PrintableField;
-            }
-        }
-
-        if ( @CustomerInfoFields ) {
-
-            $LayoutObject->Block(
-                Name => 'InformationWidget',
-                Data => {
-                    WidgetID => 'CustomerInformationWidget',
-                    WidgetTitle => 'Customer Information',
-                },
-            );
-
-            for my $Field (@CustomerInfoFields) {
-                $LayoutObject->Block(
-                    Name => 'InformationWidgetField',
-                    Data => {
-                        Label => $Field->{Label} || '-',
-                        Value => $Field->{Value} || '-',
-                    },
-                );
-            }
-        }
-    }
-
-    # Create Dynamic Field Block if configured.
-
-    my $DynamicFieldFilter = $ConfigObject->Get("Ticket::Frontend::CustomerTicketPrint")->{DynamicField};
-
-    # Get the dynamic fields for ticket object.
-
-    my $DynamicFieldList = $Kernel::OM->Get('Kernel::System::DynamicField')->DynamicFieldListGet(
-        Valid       => 1,
-        ObjectType  => ['Ticket'],
-        FieldFilter => $DynamicFieldFilter || {},
-    );
-
-    $LayoutObject->Block(
-        Name => 'InformationWidget',
-        Data => {
-            WidgetTitle => 'Dynamic Fields',
-        }
-    );
-
-    $Self->_RenderDynamicFields(
-        LayoutObject => $LayoutObject,
-        DynamicFields => $DynamicFieldList,
-        Ticket => \%Ticket
-    );
-
-    #Create Article Blocks
-
-    # Get article list.
-    my $ArticleObject = $Kernel::OM->Get('Kernel::System::Ticket::Article');
-    my @ArticleList  = $ArticleObject->ArticleList(
-        TicketID => $Ticket{TicketID},
-        UserID   => $Param{UserID},
-        IsVisibleForCustomer => 1,
-    );
-
-    my $Limit = $ConfigObject->Get('PDF::MaxPages');
-    my $RichTextEnabled = $LayoutObject->{BrowserRichText} || 0;
-
-
-    my @ArticleBox = $Self->_ArticleBoxGet(
-        ArticleBoxAll => \@ArticleList,
-        Limit         => $Limit,
-        RichTextEnabled => $RichTextEnabled,
-    );
-
-    # make ticket age readable
-    $Ticket{Age} = $LayoutObject->CustomerAge(
-        Age   => $Ticket{Age},
-        Space => ' '
-    );
-
-    # Create Article HTML
-    my $ArticleWidgetsHTML = '';
-    my $ArticleCounter = 1;
-    ARTICLE:
-    for my $ArticleTmp (@ArticleBox) {
-        my %Article = %$ArticleTmp;
-
-        $ArticleWidgetsHTML .= $Self->_RenderArticle(
-            Ticket            => \%Ticket,
-            Article           => \%Article,
-            ArticleNumber => $ArticleCounter,
-        );
-
-        #DEBUG
-        #$Kernel::OM->Get('Kernel::System::Main')->FileWrite(
-        #    Location => './DEBUG_Article_' . $ArticleCounter . '.html',
-        #    Content  => \$ArticleWidgetsHTML,
-        #);
-
-        $ArticleCounter++;
-    }
-
-    if ( $ArticleCounter == 1 ) {
-        $LayoutObject->Block(
-            Name => 'HintNoArticles',
-        );
-    } else {
-        $LayoutObject->Block(
-            Name => 'Articles',
-            Data => {
-                ArticleWidgetsHTML => $ArticleWidgetsHTML,
-            },
-        );
-    }
-
-    # Get last missing information and finish HTML output.
-    
-    my $TicketHook = $ConfigObject->Get('Ticket::Hook') || 'Ticket#';
-
-    return $LayoutObject->Output(
-        TemplateFile => 'CustomerTicketPrint',
-        Data => {
-            Hook                => $TicketHook,
-            TicketNumber        => $Ticket{TicketNumber},
-            Title               => $Ticket{Title},
-            PDFLogo             => $DisplaySettings->{PDFLogo} || '',
-        },
-    );
-}
-
-sub _PrintPDF {
-     my ( $Self, %Param ) = @_;
-
     # Check needed stuff.
-    # FileTempObject must be passed to prevent premature file deletion
-    for my $Needed (qw(HTMLFilePath FileTempObject)) {
+    for my $Needed (qw(Ticket)) {
         if ( !$Param{$Needed} ) {
             $Kernel::OM->Get('Kernel::System::Log')->Log(
                 Priority => 'error',
@@ -473,160 +191,178 @@ sub _PrintPDF {
         }
     }
 
-    my $ConfigObject = $Kernel::OM->Get('Kernel::Config');
-    my $FileTempObject = $Param{'FileTempObject'};
+    my %Ticket = %{ $Param{Ticket} };
 
-    my $HTMLFilePath = $Param{HTMLFilePath};
-    my ($FileHandle, $PDFFilePath) = $FileTempObject->TempFile(
-        Suffix => '.pdf'
+    my $LayoutObject  = $Kernel::OM->Get('Kernel::Output::HTML::Layout');
+    my $ArticleObject = $Kernel::OM->Get('Kernel::System::Ticket::Article');
+    my $ConfigObject  = $Kernel::OM->Get('Kernel::Config');
+    my $MainObject    = $Kernel::OM->Get('Kernel::System::Main');
+
+    my $DisplaySettings = $ConfigObject->Get('Ticket::Frontend::CustomerTicketPrint') // {};
+
+    my $Order = $Self->{ArticleSort} eq 'reverse' ? 'DESC' : 'ASC';
+
+    # Get all articles.
+    my @ArticleBox = $ArticleObject->ArticleList(
+        TicketID             => $Self->{TicketID},
+        IsVisibleForCustomer => 1,
     );
-    $FileHandle->close();
 
-    my $ChromePath = $ConfigObject->Get('GoogleChrome::Bin');
-    if ( !$ChromePath ) {
+    if ( $Order eq 'DESC' ) {
+        @ArticleBox = reverse @ArticleBox;
+    }
+
+    # show only specified article
+    if ( $Self->{ArticleID}) {
+        ARTICLE:
+        for my $Article (@ArticleBox) {
+            next ARTICLE if !$Article->{ArticleID};
+            next ARTICLE if $Self->{ArticleID} ne $Article->{ArticleID};
+
+            @ArticleBox = ($Article);
+
+            last ARTICLE;
+        }
+    }
+
+    # age design
+    $Ticket{Age} = $LayoutObject->CustomerAge(
+        Age   => $Ticket{Age},
+        Space => ' '
+    );
+
+    my $TicketInfoHTML = $DisplaySettings->{TicketInformation} ? $Self->_RenderTicketInfo( Ticket => \%Ticket ) : '';
+
+    # set display options
+    $Param{Hook} = $ConfigObject->Get('Ticket::Hook') || 'Ticket#';
+
+    # number of articles
+    $Param{ArticleCount} = scalar @ArticleBox;
+
+    # print logo
+    $Param{PDFLogo} = '';
+    if ( $DisplaySettings->{PrintLogoFile} ) {
+        $Param{PDFLogo} = $DisplaySettings->{PrintLogoFile};
+    }
+
+    $LayoutObject->Block(
+        Name => 'Header',
+        Data => { %Param, %Ticket },
+    );
+
+    my @ArticleIDs;
+    my $ArticleWidgetsHTML = '';
+
+    ARTICLE:
+    for my $Article (@ArticleBox) {
+
+        $ArticleWidgetsHTML .= $Self->_ArticleRender(
+            TicketID               => $Ticket{TicketID},
+            ArticleID              => $Article->{ArticleID},
+            UserID                 => $Self->{UserID},
+        );
+
+        push @ArticleIDs, $Article->{ArticleID};
+    }
+
+    $Param{ArticleItems} = $ArticleWidgetsHTML;
+
+    # show no articles block if ticket does not contain articles
+    if ( !@ArticleBox ) {
+        $LayoutObject->Block(
+            Name => 'HintNoArticles',
+        );
+    }
+
+    # return output
+    return $LayoutObject->Output(
+        TemplateFile => 'CustomerTicketPrint',
+        Data         => {
+            %Param,
+            %Ticket,
+            TicketInfoHTML => $TicketInfoHTML,
+        },
+    );
+}
+
+=head2 _ArticleRender()
+
+Returns article html.
+
+Implementation based on
+Kernel::Output::HTML::TicketZoom::Agent::MIMEBase->ArticleRender() and
+Kernel::Modules::AgentTicketArticleContent->Run()
+
+Result:
+    $HTML = "<div>...</div>";
+
+=cut
+
+sub _ArticleRender {
+    my ( $Self, %Param ) = @_;
+
+    # Check needed stuff.
+    for my $Needed (qw(TicketID ArticleID)) {
+        if ( !$Param{$Needed} ) {
+            $Kernel::OM->Get('Kernel::System::Log')->Log(
+                Priority => 'error',
+                Message  => "Need $Needed!",
+            );
+            return;
+        }
+    }
+
+    $Param{ShowBrowserLinkMessage} = 0;
+
+    my $LayoutObject      = $Kernel::OM->Get('Kernel::Output::HTML::Layout');
+    my $ConfigObject      = $Kernel::OM->Get('Kernel::Config');
+    my $ArticleBaseObject = $Kernel::OM->Get('Kernel::Output::HTML::TicketZoom::Agent::Base');
+
+# First part is based on Kernel::Output::HTML::TicketZoom::Agent::MIMEBase->ArticleRender()
+
+    # Get article data.
+    my $ArticleBackendObject = $Kernel::OM->Get('Kernel::System::Ticket::Article')->BackendForArticle(%Param);
+
+    my %Article = $ArticleBackendObject->ArticleGet(
+        %Param,
+        RealNames => 1,
+    );
+    if ( !%Article ) {
         $Kernel::OM->Get('Kernel::System::Log')->Log(
             Priority => 'error',
-            Message  => "Google Chrome path not configured!",
+            Message  => "Article not found (ArticleID=$Param{ArticleID})!"
         );
         return;
     }
 
-    my $CommandResult = `'$ChromePath' --no-sandbox --aggressive-cache-discard --headless --print-to-pdf='$PDFFilePath' --no-pdf-header-footer --virtual-time-budget=25000 '$HTMLFilePath' 2>&1`;
-    $Kernel::OM->Get('Kernel::System::Log')->Log(
-        Priority => 'debug',
-        Message  => "Chrome PDF Print: " . $CommandResult,
+    # Get channel specific fields
+    my %ArticleFields = $LayoutObject->ArticleFields(%Param);
+
+    # Get dynamic fields and accounted time
+    my %ArticleMetaFields = $ArticleBaseObject->ArticleMetaFields(%Param);
+
+    # Get data from modules like Google CVE search
+    my @ArticleModuleMeta = $ArticleBaseObject->_ArticleModuleMeta(%Param);
+
+    # Show created by string, if creator is different from admin user.
+    if ( $Article{CreateBy} > 1 ) {
+        $Article{CreateByUser} = $Kernel::OM->Get('Kernel::System::User')->UserName( UserID => $Article{CreateBy} );
+    }
+
+    my %CommunicationChannel = $Kernel::OM->Get('Kernel::System::CommunicationChannel')->ChannelGet(
+        ChannelID => $Article{CommunicationChannelID},
     );
 
-    return $PDFFilePath;
-}
+# Implementation based on Kernel::Modules::AgentTicketArticleContent from here on.
 
-sub _ArticleBoxGet {
-    my ( $Self, %Param ) = @_;
-
-    # Check needed params.
-    for my $Needed (qw(ArticleBoxAll Limit)) {
-        if ( !$Param{$Needed} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
-                Priority => "error",
-                Message  => "Need $Needed!"
-            );
-            return;
-        }
-    }
-
-    my $ShowHTML = $Param{RichTextEnabled} || 0;
-
-    my @ArticleList = @{ $Param{ArticleBoxAll} };
-
-    my $ArticleObject = $Kernel::OM->Get('Kernel::System::Ticket::Article');
-    my $LayoutObject  = $Kernel::OM->Get('Kernel::Output::HTML::Layout');
-
-    my $Start = 0;
-    my $End = $Param{Limit} - 1;
-
-    my $LastArticleIndex = scalar @ArticleList - 1;
-    if ( $LastArticleIndex < $End) {
-        $End = $LastArticleIndex
-    }
-
-    my @ArticleBox;
-    
-    for my $Index ($Start .. $End) {
-        my $ArticleBackendObject = $ArticleObject->BackendForArticle( 
-            %{$Param{ArticleBoxAll}->[$Index]},
-        );
-        my %Article              = $ArticleBackendObject->ArticleGet(
-            %{$Param{ArticleBoxAll}->[$Index]},
-            DynamicFields => 0,
-        );
-        my %Attachments = $ArticleBackendObject->ArticleAttachmentIndex(
-            %{$Param{ArticleBoxAll}->[$Index]},
-            ExcludePlainText => 1,
-            ExcludeHTMLBody  => 1,
-            ExcludeInline    => 1,
-        );
-
-        # create attachments string.
-        my $AttachmentsString = '';
-        for my $FileID ( sort keys %Attachments ) {
-            my %File     = %{ $Attachments{$FileID} };
-            my $Filesize = $LayoutObject->HumanReadableDataSize( Size => $File{FilesizeRaw} );
-            $AttachmentsString .= $File{Filename} . ' (' . $Filesize . ")\n";
-        }
-        $Article{Attachments} = $AttachmentsString;
-
-        push @ArticleBox, \%Article;
-    }
-
-    return @ArticleBox;
-}
-
-sub _RenderArticle {
-    my ( $Self, %Param ) = @_;
-
-    # Check needed params.
-    for my $Needed (qw(Ticket Article)) {
-        if ( !$Param{$Needed} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
-                Priority => "error",
-                Message  => "Need $Needed!"
-            );
-            return;
-        }
-    }
-
-    #TODO:REMOVE TEST CODE
-    #return '<div><h3>This is a test article</h3></div>';
-
-    my %Ticket  = %{ $Param{Ticket} };
-    my %Article = %{ $Param{Article} };
-    my $ArticleNumber = $Param{ArticleNumber} || 0;
-
-    my $LayoutObject = $Kernel::OM->Get('Kernel::Output::HTML::Layout');
-    my $ConfigObject = $Kernel::OM->Get('Kernel::Config');
     my $ArticleStorage = $ConfigObject->Get('Ticket::Article::Backend::MIMEBase::ArticleStorage');
-    my $LogObject    = $Kernel::OM->Get('Kernel::System::Log');
-    my $ArticleBackendObject = $Kernel::OM->Get('Kernel::System::Ticket::Article')->BackendForArticle(
-        %Article,
-    );
 
-    # Display article fields.
-    my %AllArticleFields = $LayoutObject->ArticleFields(%Article);
-    my @ArticleFields;
-    ARTICLE_FIELD:
-    for my $ArticleFieldKey (
-        sort { $AllArticleFields{$a}->{Prio} <=> $AllArticleFields{$b}->{Prio} }
-        keys %AllArticleFields
-        )
-    {
-        my %ArticleField = %{ $AllArticleFields{$ArticleFieldKey} // {} };
-
-        next ARTICLE_FIELD if $ArticleField{HideInCustomerInterface};
-        next ARTICLE_FIELD if $ArticleField{HideInTicketPrint};
-        next ARTICLE_FIELD if !$ArticleField{Value};
-
-        push @ArticleFields, \%ArticleField;
-    }
-
-    my $CreateTime = $LayoutObject->{LanguageObject}->FormatTimeString(
-        $Article{CreateTime},
-        'DateFormat',
-    ),
-
-    # Get dynamic field config
-    my $DynamicFieldFilter = $ConfigObject->Get("Ticket::Frontend::CustomerTicketPrint")->{DynamicField};
-
-    # Get the dynamic fields for ticket object.
-    my $AllDynamicFields = $Kernel::OM->Get('Kernel::System::DynamicField')->DynamicFieldListGet(
-        Valid       => 1,
-        ObjectType  => ['Article'],
-        FieldFilter => $DynamicFieldFilter || {},
-    );
-
-    
+    my $RichTextEnabled = $ConfigObject->Get('Ticket::Frontend::ZoomRichTextForce')
+        || $LayoutObject->{BrowserRichText}
+        || 0;
 
     # Show HTML if RichText is enabled and HTML attachment isn't missing.
-    my $ShowHTML = $LayoutObject->{BrowserRichText} || 0;
+    my $ShowHTML = $RichTextEnabled;
 
     my $HTMLBodyAttachID = $Kernel::OM->Get('Kernel::Output::HTML::Article::MIMEBase')->HTMLBodyAttachmentIDGet(
         ArticleID           => $Article{ArticleID},
@@ -642,6 +378,7 @@ sub _RenderArticle {
         $ArticleContent = $LayoutObject->ArticlePreview(
             ArticleID           => $Article{ArticleID},
             TicketID            => $Article{TicketID},
+            ShowDeletedArticles => 0,
             ArticleStorage      => $ArticleStorage,
             SourceArticleID     => $Self->{SourceArticleID},
             ResultType          => 'html',
@@ -652,6 +389,7 @@ sub _RenderArticle {
         $ArticleContent = $LayoutObject->ArticlePreview(
             ArticleID           => $Article{ArticleID},
             TicketID            => $Article{TicketID},
+            ShowDeletedArticles => 0,
             ArticleStorage      => $ArticleStorage,
             SourceArticleID     => $Self->{SourceArticleID},
             ResultType          => 'plain',
@@ -668,7 +406,7 @@ sub _RenderArticle {
     }
 
     if ( !$ArticleContent ) {
-        $LogObject->Log(
+        $Kernel::OM->Get('Kernel::System::Log')->Log(
             Message  => 'No such article!',
             Priority => 'error',
         );
@@ -676,9 +414,22 @@ sub _RenderArticle {
         return $LayoutObject->ErrorScreen();
     }
 
-    my %AttachementList = $ArticleBackendObject->ArticleAttachmentIndex(
+    # generate base url
+    my $URL;
+
+    if ( !$Self->{VersionView} ) {
+        $URL = 'Action=AgentTicketAttachment;Subaction=HTMLView'
+            . ";TicketID=$Article{TicketID};ArticleID=$Article{ArticleID};FileID=";
+    }
+    else {
+        $URL = 'Action=AgentTicketAttachment;Subaction=HTMLView'
+            . ";TicketID=$Article{TicketID};ArticleID=$Article{ArticleID};VersionView=1;SourceArticleID=$Self->{SourceArticleID};FileID=";
+    }
+
+    # replace links to inline images in html content
+    my %AtmBox = $ArticleBackendObject->ArticleAttachmentIndex(
         ArticleID       => $Article{ArticleID},
-        SourceArticleID => $Self->{SourceArticleID}
+        SourceArticleID => $Self->{SourceArticleID},
     );
 
     # Do not load external images if 'BlockLoadingRemoteContent' is enabled.
@@ -687,7 +438,15 @@ sub _RenderArticle {
         $LoadExternalImages = 0;
     }
 
-    # replace links to inline images with base64 encoded images
+    my $SenderInitials  = $LayoutObject->UserInitialsGet(
+        Fullname => $Article{FromRealname},
+    );
+
+    my $SenderImage => $Kernel::OM->Get('Kernel::Output::HTML::TicketZoom::Agent::Base')->_ArticleSenderImage(
+        Sender => $Article{From},
+        UserID => $Self->{UserID},
+    );
+
     $ArticleContent =~ s{
         (=|"|')cid:(.*?)("|'|>|\/>|\s)
     }
@@ -707,8 +466,8 @@ sub _RenderArticle {
 
         # find matching attachment and replace it with base64 of image
         ATTACHMENT_ID:
-        for my $AttachmentID ( sort keys %AttachementList ) {
-            next ATTACHMENT_ID if lc $AttachementList{$AttachmentID}{ContentID} ne lc "<$ContentID>";
+        for my $AttachmentID ( sort keys %AtmBox ) {
+            next ATTACHMENT_ID if lc $AtmBox{$AttachmentID}{ContentID} ne lc "<$ContentID>";
 
             my %Attachment = $ArticleBackendObject->ArticleAttachment(
                 ArticleID => $Article{ArticleID},
@@ -730,17 +489,17 @@ sub _RenderArticle {
     # http://www.ietf.org/rfc/rfc2557.txt
     # find matching attachment and replace it with runtlime url to image
     ATTACHMENT:
-    for my $AttachmentID ( sort keys %AttachementList ) {
-        next ATTACHMENT if !$AttachementList{$AttachmentID}{ContentID};
+    for my $AttachmentID ( sort keys %AtmBox ) {
+        next ATTACHMENT if !$AtmBox{$AttachmentID}{ContentID};
 
         # content id cleanup
-        $AttachementList{$AttachmentID}{ContentID} =~ s/^<//;
-        $AttachementList{$AttachmentID}{ContentID} =~ s/>$//;
+        $AtmBox{$AttachmentID}{ContentID} =~ s/^<//;
+        $AtmBox{$AttachmentID}{ContentID} =~ s/>$//;
 
-        next ATTACHMENT if !$AttachementList{$AttachmentID}{ContentID};
+        next ATTACHMENT if !$AtmBox{$AttachmentID}{ContentID};
 
         $Article{Body} =~ s{
-            (=|"|')(\Q$AttachementList{$AttachmentID}{ContentID}\E)("|'|>|\/>|\s)
+            (=|"|')(\Q$AtmBox{$AttachmentID}{ContentID}\E)("|'|>|\/>|\s)
         }
         {
             my $Start= $1;
@@ -802,193 +561,298 @@ sub _RenderArticle {
     #remove meta tag
     $ArticleContent =~ s/<meta[^<>]*>//g;
 
-    #DEBUG
-    #$Kernel::OM->Get('Kernel::System::Main')->FileWrite(
-    #    Location => './DEBUG_Article_' . $ArticleNumber . '_Content.html',
-    #    Content  => \$ArticleContent,
-    #);
-
     return $LayoutObject->Output(
-        TemplateFile => 'TicketPrintHTML/CustomerMIMEBase',
+        TemplateFile => 'TicketPrintHTML/MIMEBase',
         Data         => {
-            ArticleFields        => \@ArticleFields,
-            ArticleContent       => $ArticleContent,
+            %Article,
+            ArticleFields        => \%ArticleFields,
+            CommunicationChannel => $CommunicationChannel{DisplayName},
+            ArticleMetaFields    => \%ArticleMetaFields,
+            SenderImage          => $SenderImage,
+            SenderInitials       => $SenderInitials,
+            HTML                 => $ArticleContent,
             Styles               => $CombinedStyles,
-            ArticleNumber        => $ArticleNumber,
-            SenderType           => $Article{SenderType} || '-',
-            CreateTime           => $CreateTime,
+            ArticleModuleMeta    => \@ArticleModuleMeta
         },
     )
 }
 
-sub _RenderDynamicFields {
+=head2 _PrintPDF()
+
+Generates a PDF from an HTML file using Google Chrome in headless mode.
+
+This function requires the path to the HTML file to be specified in the
+C<HTMLFilePath> parameter. It retrieves the path to the Google Chrome binary
+from the configuration and executes Chrome with specific flags to convert the
+HTML file to a PDF.
+
+Returns the path of the resulting .pdf file.
+
+=cut
+
+sub _PrintPDF {
     my ( $Self, %Param ) = @_;
 
-    # Check needed params.
-    for my $Needed (qw(LayoutObject DynamicFields Ticket)) {
+    # Check needed stuff.
+    # FileTempObject must be passed to prevent premature file deletion
+    for my $Needed (qw(HTMLFilePath FileTempObject)) {
         if ( !$Param{$Needed} ) {
             $Kernel::OM->Get('Kernel::System::Log')->Log(
-                Priority => "error",
-                Message  => "Need $Needed!"
+                Priority => 'error',
+                Message  => "Need $Needed!",
             );
             return;
         }
     }
 
-    my $LayoutObject = $Param{LayoutObject};
-    my @DynamicFields  = @{ $Param{DynamicFields} };
-    my %Ticket = %{ $Param{Ticket} };
+    my $ConfigObject = $Kernel::OM->Get('Kernel::Config');
+    my $FileTempObject = $Param{'FileTempObject'};
 
-    my $DynamicFieldBackendObject = $Kernel::OM->Get('Kernel::System::DynamicField::Backend');
+    my $HTMLFilePath = $Param{HTMLFilePath};
+    my ($FileHandle, $PDFFilePath) = $FileTempObject->TempFile(
+        Suffix => '.pdf'
+    );
+    $FileHandle->close();
 
-    my @DynamicFieldInfos;
+    my $ChromePath = $ConfigObject->Get('GoogleChrome::Bin');
+    if ( !$ChromePath ) {
+        $Kernel::OM->Get('Kernel::System::Log')->Log(
+            Priority => 'error',
+            Message  => "Google Chrome path not configured!",
+        );
+        return;
+    }
+
+    my $CommandResult = `'$ChromePath' --no-sandbox --aggressive-cache-discard --headless --print-to-pdf='$PDFFilePath' --no-pdf-header-footer --virtual-time-budget=25000 '$HTMLFilePath' 2>&1`;
+    $Kernel::OM->Get('Kernel::System::Log')->Log(
+        Priority => 'debug',
+        Message  => "Chrome PDF Print: " . $CommandResult,
+    );
+
+    return $PDFFilePath;
+}
+
+sub _RenderTicketInfo {
+    my ( $Self, %Param ) = @_;
+
+    my $LayoutObject = $Kernel::OM->Get('Kernel::Output::HTML::Layout');
+    my $ConfigObject = $Kernel::OM->Get('Kernel::Config');
+
+    # TODO: Provide a CustomerTicketPrint Config?
+    my $Config = $ConfigObject->Get("Ticket::Frontend::CustomerTicketZoom");
+
+    # ticket type
+    if ( $ConfigObject->Get('Ticket::Type') && $Config->{AttributesView}->{Type} ) {
+
+        my %Type = $Kernel::OM->Get('Kernel::System::Type')->TypeGet(
+            Name => $Param{Type},
+        );
+
+        $LayoutObject->Block(
+            Name => 'Type',
+            Data => {
+                Valid => $Type{ValidID},
+                %Param,
+            }
+        );
+    }
+
+    # ticket service
+    if (
+        $Param{Service}
+        &&
+        $ConfigObject->Get('Ticket::Service')
+        && $Config->{AttributesView}->{Service}
+        )
+    {
+        $LayoutObject->Block(
+            Name => 'Service',
+            Data => \%Param,
+        );
+        if (
+            $Param{SLA}
+            && $ConfigObject->Get('Ticket::Service')
+            && $Config->{AttributesView}->{SLA}
+            )
+        {
+            $LayoutObject->Block(
+                Name => 'SLA',
+                Data => \%Param,
+            );
+        }
+    }
+
+    # ticket state
+    if ( $Config->{AttributesView}->{State} ) {
+        $LayoutObject->Block(
+            Name => 'State',
+            Data => \%Param,
+        );
+    }
+
+    # ticket priority
+    if ( $Config->{AttributesView}->{Priority} ) {
+        $LayoutObject->Block(
+            Name => 'Priority',
+            Data => \%Param,
+        );
+    }
+
+    # ticket queue
+    if ( $Config->{AttributesView}->{Queue} ) {
+        $LayoutObject->Block(
+            Name => 'Queue',
+            Data => \%Param,
+        );
+    }
+
+    my $AgentUserObject = $Kernel::OM->Get('Kernel::System::User');
+
+    # ticket owner
+    if ( $Config->{AttributesView}->{Owner} ) {
+        my $OwnerName = $AgentUserObject->UserName(
+            UserID => $Param{OwnerID},
+        );
+        $LayoutObject->Block(
+            Name => 'Owner',
+            Data => { OwnerName => $OwnerName },
+        );
+    }
+
+    # ticket responsible
+    if (
+        $ConfigObject->Get('Ticket::Responsible')
+        &&
+        $Config->{AttributesView}->{Responsible}
+        )
+    {
+        my $ResponsibleName = $AgentUserObject->UserName(
+            UserID => $Param{ResponsibleID},
+        );
+        $LayoutObject->Block(
+            Name => 'Responsible',
+            Data => {
+                ResponsibleName => $ResponsibleName,
+            },
+        );
+    }
+
+    my $TicketObject = $Kernel::OM->Get('Kernel::System::Ticket');
+
+    # check if ticket is normal or process ticket
+    my $IsProcessTicket = $TicketObject->TicketCheckForProcessType(
+        'TicketID' => $Self->{TicketID},
+    );
+
+    # show process widget  and activity dialogs on process tickets
+    if ($IsProcessTicket) {
+
+        # get the DF where the ProcessEntityID is stored
+        my $ProcessEntityIDField = 'DynamicField_'
+            . $ConfigObject->Get("Process::DynamicFieldProcessManagementProcessID");
+
+        # get the DF where the AtivityEntityID is stored
+        my $ActivityEntityIDField = 'DynamicField_'
+            . $ConfigObject->Get("Process::DynamicFieldProcessManagementActivityID");
+
+        # create additional objects for process management
+        my $ActivityObject       = $Kernel::OM->Get('Kernel::System::ProcessManagement::Activity');
+        my $ActivityDialogObject = $Kernel::OM->Get('Kernel::System::ProcessManagement::ActivityDialog');
+        my $ProcessObject        = $Kernel::OM->Get('Kernel::System::ProcessManagement::Process');
+        my $ProcessData          = $ProcessObject->ProcessGet(
+            ProcessEntityID => $Param{$ProcessEntityIDField},
+        );
+
+        my $ActivityData = $ActivityObject->ActivityGet(
+            Interface        => 'CustomerInterface',
+            ActivityEntityID => $Param{$ActivityEntityIDField},
+        );
+
+        # output process information in the sidebar
+        $LayoutObject->Block(
+            Name => 'ProcessData',
+            Data => {
+                Process  => $ProcessData->{Name}  || '',
+                Activity => $ActivityData->{Name} || '',
+            },
+        );
+    }
+
+    my $DynamicFieldObject = $Kernel::OM->Get('Kernel::System::DynamicField');
+    my $BackendObject      = $Kernel::OM->Get('Kernel::System::DynamicField::Backend');
+
+    # get the dynamic fields for ticket object
+    my $DynamicField = $DynamicFieldObject->DynamicFieldListGet(
+        Valid       => 1,
+        ObjectType  => ['Ticket'],
+        FieldFilter => $Config->{DynamicField} || {},
+    );
+
+    # cycle trough the activated Dynamic Fields for ticket object
     DYNAMICFIELD:
-    for my $DynamicFieldConfig ( @DynamicFields ) {
+    for my $DynamicFieldConfig ( @{$DynamicField} ) {
         next DYNAMICFIELD if !IsHashRefWithData($DynamicFieldConfig);
 
-        # Skip the dynamic field if it is not designed for customer interface.
-        my $IsCustomerInterfaceCapable = $DynamicFieldBackendObject->HasBehavior(
+        # skip the dynamic field if is not designed for customer interface
+        my $IsCustomerInterfaceCapable = $BackendObject->HasBehavior(
             DynamicFieldConfig => $DynamicFieldConfig,
             Behavior           => 'IsCustomerInterfaceCapable',
         );
         next DYNAMICFIELD if !$IsCustomerInterfaceCapable;
 
-        if ($Param{ArticleID}) {
-            my $Value = $DynamicFieldBackendObject->ValueGet(
-                DynamicFieldConfig => $DynamicFieldConfig,
-                ObjectID           => $Param{ArticleID},
-            );
-
-            next DYNAMICFIELD if !$Value;
-            next DYNAMICFIELD if $Value eq "";
-        }
-        
-
-        # Get print string for this dynamic field.
-        my $ValueStrg = $DynamicFieldBackendObject->ReadableValueRender(
+        my $Value = $BackendObject->ValueGet(
             DynamicFieldConfig => $DynamicFieldConfig,
-            Value              => $Ticket{ 'DynamicField_' . $DynamicFieldConfig->{Name} },
+            ObjectID           => $Param{TicketID},
         );
 
-        my $Label = $LayoutObject->{LanguageObject}->Translate( $DynamicFieldConfig->{Label} );
+        next DYNAMICFIELD if !defined $Value;
+        next DYNAMICFIELD if $Value eq "";
 
-        push @DynamicFieldInfos, {
-            $DynamicFieldConfig->{Name} => $ValueStrg->{Title},
-            Name                        => $DynamicFieldConfig->{Name},
-            Value                       => $ValueStrg->{Value},
-            Label                       => $Label,
+        # get print string for this dynamic field
+        my $ValueStrg = $BackendObject->DisplayValueRender(
+            DynamicFieldConfig => $DynamicFieldConfig,
+            Value              => $Value,
+#            ValueMaxChars      => 100,
+            HTMLOutput         => 0,
+            LayoutObject       => $LayoutObject,
+        );
 
-            # Include unique parameter with dynamic field name in case of collision with others.
-            #   Please see bug#13362 for more information.
-            "DynamicField_$DynamicFieldConfig->{Name}" => $ValueStrg->{Title},
-        }
-    }
+        my $Label = $DynamicFieldConfig->{Label};
 
-    $LayoutObject->Block(
-        Name => 'DynamicFields'
-    );
+        $LayoutObject->Block(
+            Name => 'TicketDynamicField',
+            Data => {
+                Label => $Label,
+            },
+        );
 
-    for my $Field (@DynamicFieldInfos) {
-
-        my ($DFConfig) = grep { $_->{Name} eq $Field->{Name} } @DynamicFields;
-
-        # set field
-        if ( $DFConfig->{FieldType} eq 'Set' ) {
-
+        if ( $DynamicFieldConfig->{Config}->{Link} ) {
             $LayoutObject->Block(
-                Name => 'SetField',
-            );
-
-            $LayoutObject->Block(
-                Name => 'DynamicFieldSetSeparator',
+                Name => 'TicketDynamicFieldLink',
                 Data => {
-                    Name => $Field->{Name},
+                    Value                       => $ValueStrg->{Value},
+                    Title                       => $ValueStrg->{Title},
+                    Link                        => $DynamicFieldConfig->{Config}->{Link},
+                    LinkPreview                 => $DynamicFieldConfig->{Config}->{LinkPreview},
+                    $DynamicFieldConfig->{Name} => $ValueStrg->{Value},
                 },
             );
-
-            my @IncludedFields = $Self->_GetIncludedFieldOrdered(
-                Include => $DFConfig->{Config}{Include},
-            );
-
-            for my $IncludeField (@IncludedFields) {
-
-                my $IncludeDFConfig = $Kernel::OM->Get('Kernel::System::DynamicField')->DynamicFieldGet(
-                    Name => $IncludeField,
-                );
-                my $ValueStrg = $DynamicFieldBackendObject->DisplayValueRender(
-                    DynamicFieldConfig => $IncludeDFConfig,
-                    Value              => $Ticket{ 'DynamicField_' . $IncludeDFConfig->{Name} },
-                    LayoutObject       => $LayoutObject,
-
-                    # no ValueMaxChars here, enough space available
-                );
-
-                my %IncludeField = (
-                    $IncludeDFConfig->{Name} => $ValueStrg->{Title},
-                    Name                     => $IncludeDFConfig->{Name},
-                    Value                    => $ValueStrg->{Value},
-                    Label                    => $IncludeDFConfig->{Label},
-
-                    # Include unique parameter with dynamic field name in case of collision with others.
-                    #   Please see bug#13362 for more information.
-                    "DynamicField_$IncludeDFConfig->{Name}" => $ValueStrg->{Title},
-                );
-
-                $LayoutObject->Block(
-                    Name => 'SetDynamicField',
-                    Data => {
-                        Label => $IncludeField{Label},
-                    }
-                );
-
-                $LayoutObject->Block(
-                    Name => 'SetDynamicFieldValue',
-                    Data => {
-                        Value => $IncludeField{Value},
-                    },
-                );
-            }
         }
-
-        # standard field
         else {
             $LayoutObject->Block(
-                Name => 'StandardField',
+                Name => 'TicketDynamicFieldPlain',
                 Data => {
-                    Name  => $Field->{Name},
-                    Value => $Field->{Value},
+                    Value => $ValueStrg->{Value},
+                    Title => $ValueStrg->{Title},
                 },
             );
         }
     }
 
+    return $LayoutObject->Output(
+        TemplateFile => 'CustomerTicketZoom/TicketInfo',
+        Data         => {},
+    );
 }
 
-sub _GetIncludedFieldOrdered {
-    my ( $Self, %Param ) = @_;
-
-    my @Return;
-
-    ITEM:
-    for my $IncludeItem ( @{ $Param{Include} } ) {
-
-        if ( $IncludeItem->{Grid} ) {
-            for my $Row ( @{ $IncludeItem->{Grid}{Rows} } ) {
-
-                COLUMN:
-                for my $DFEntry ( $Row->@* ) {
-                    next COLUMN if !$DFEntry->{DF};
-
-                    push @Return, $DFEntry->{DF};
-                }
-            }
-        }
-        elsif ( $IncludeItem->{DF} ) {
-            push @Return, $IncludeItem->{DF};
-        }
-    }
-
-    return @Return;
-}
-    
 1;

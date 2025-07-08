@@ -9,11 +9,14 @@
     <Description Lang="en">Print Tickets with advanced formatting, including images.</Description>
     <Description Lang="de">Ticket Druck mit verbesserter Formatierung inklusive Bildern.</Description>
     <Filelist>
-        <File Permission="660" Location="Kernel/Config/Files/XML/TicketPrintHTML.xml" />
         <File Permission="660" Location="Custom/Kernel/Modules/AgentTicketPrint.pm" />
+        <File Permission="660" Location="Custom/Kernel/Modules/CustomerTicketPrint.pm" />
+        <File Permission="660" Location="Kernel/Config/Files/XML/TicketPrintHTML.xml" />
         <File Permission="660" Location="Kernel/Output/HTML/Templates/Standard/AgentTicketPrint.tt" />
-        <File Permission="660" Location="Kernel/Output/HTML/Templates/Standard/AgentTicketPrint/MIMEBase.tt" />
-        <File Permission="660" Location="Kernel/Output/HTML/Templates/Standard/AgentTicketPrint/PrintStyles.tt" />
+        <File Permission="660" Location="Kernel/Output/HTML/Templates/Standard/TicketPrintHTML/MIMEBase.tt" />
+        <File Permission="660" Location="Kernel/Output/HTML/Templates/Standard/TicketPrintHTML/CustomerMIMEBase.tt" />
+        <File Permission="660" Location="Kernel/Output/HTML/Templates/Standard/TicketPrintHTML/PrintStyles.tt" />
+        <File Permission="660" Location="Kernel/Output/HTML/Templates/Standard/CustomerTicketPrint.tt" />
         <File Permission="660" Location="scripts/docker-compose/seccomp_profile.json" />
     </Filelist>
 </otobo_package>

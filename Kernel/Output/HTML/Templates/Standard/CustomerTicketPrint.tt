@@ -24,11 +24,12 @@
         <meta id="viewport" name="viewport" content="">
         <meta name="robots" content="noindex,nofollow" />
 
-        [% InsertTemplate("AgentTicketPrint/PrintStyles.tt") %]
+        [% InsertTemplate("TicketPrintHTML/PrintStyles.tt") %]
 
-
+        <title>[% Data.TitleArea | html %][% Config("ProductName") %]</title>
     </head>
     <body>
+[% RenderBlockStart("Header") %]
         <div class="ARIARoleMain TicketPrint CustomerTicketPrint UseArticleColors">
             <div class="Headline NoMargin">
                 <h1>
@@ -38,69 +39,11 @@
                     <img src="[% Data.PDFLogo | html %]">
                 </div>
             </div>
+[% RenderBlockEnd("Header") %]
 
-[% RenderBlockStart("InformationWidget") %]
-            <div class="WidgetSimple Expanded" id="[% Data.WidgetID | html %]">
-                <div class="Header">
-                    <h2>[% Translate(Data.WidgetTitle)  | html %]</h2>
-                </div>
-                <div class="Content">
-                    <div>
-                        <fieldset class="TableLike FixedLabelSmall Narrow">
+            [% Data.TicketInfoHTML %]
 
-    [% RenderBlockStart("InformationWidgetField") %]
-                            <div class="FieldContainer">
-                                <label title="[% Data.Label | html %]">
-                                    [% Data.Label | html %]:
-                                </label>
-                                <p class="Value">
-                                    [% Data.Value | html %]
-                                </p>
-                            </div>
-    [% RenderBlockEnd("InformationWidgetField") %]
-
-                        </fieldset>
-
-    [% RenderBlockStart("DynamicFields") %]
-                        <fieldset>
-        [% RenderBlockStart("StandardField") %]
-                            <div class="FieldContainer DynamicFieldAutoResize">
-                                <label title="[% Data.Label | html %]">
-                                    [% Data.Label | html %]:
-                                </label>
-                                <p>
-                                    [% Data.Value %]
-                                </p>
-                            </div>
-        [% RenderBlockEnd("StandardField") %]
-        [% RenderBlockStart("SetField") %]
-                            <div class="SetDynamicField">
-            [% RenderBlockStart("DynamicFieldSetSeparator") %]
-                                <h2 class="FieldSetSeparator">[% Translate(Data.Name) | html %]</h2>
-            [% RenderBlockEnd("DynamicFieldSetSeparator") %]
-                                <div>
-            [% RenderBlockStart("SetDynamicField") %]
-                                    <div class="FieldContainer DynamicFieldAutoResize">
-                                        <label title="[% Data.Label | html %]">
-                                            [% Data.Label | html %]
-                                        </label>
-                                        <p>
-                [% RenderBlockStart("SetDynamicFieldValue") %]
-                                            [% Data.Value %]
-                [% RenderBlockEnd("SetDynamicFieldValue") %]
-                                        </p>
-                                    </div>
-            [% RenderBlockEnd("SetDynamicField") %]
-                                </div>
-                            </div>
-        [% RenderBlockEnd("SetField") %]
-                        </fieldset>
-    [% RenderBlockEnd("DynamicFields") %]
-                    </div>
-                </div>
-            </div>
-[% RenderBlockEnd("InformationWidget") %]
-
+        <div id="ArticleItems">
 [% RenderBlockStart("HintNoArticles") %]
             <div class="WidgetSimple">
                 <div class="Content">
@@ -108,13 +51,7 @@
                 </div>
             </div>
 [% RenderBlockEnd("HintNoArticles") %]
-
-[% RenderBlockStart("Articles") %]
-            <div id="ArticleItems">
-                [% Data.ArticleWidgetsHTML %]
-            </div>
-[% RenderBlockEnd("Articles") %]
-        
+            [% Data.ArticleItems %]
         </div>
 
         <script type="text/javascript">
