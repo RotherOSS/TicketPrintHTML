@@ -318,7 +318,6 @@ sub _CreateHTMLContent {
             TicketID               => $Ticket{TicketID},
             ArticleID              => $Article->{ArticleID},
             UserID                 => $Self->{UserID},
-            ShowBrowserLinkMessage => 0,
         );
 
         push @ArticleIDs, $Article->{ArticleID};
@@ -389,7 +388,7 @@ sub _ArticleRender {
     my ( $Self, %Param ) = @_;
 
     # Check needed stuff.
-    for my $Needed (qw(TicketID ArticleID Type)) {
+    for my $Needed (qw(TicketID ArticleID)) {
         if ( !$Param{$Needed} ) {
             $Kernel::OM->Get('Kernel::System::Log')->Log(
                 Priority => 'error',
@@ -398,6 +397,8 @@ sub _ArticleRender {
             return;
         }
     }
+
+    $Param{ShowBrowserLinkMessage} = 0;
 
     my $LayoutObject      = $Kernel::OM->Get('Kernel::Output::HTML::Layout');
     my $ConfigObject      = $Kernel::OM->Get('Kernel::Config');
