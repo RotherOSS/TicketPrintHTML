@@ -72,12 +72,22 @@ div.TicketPrint {
     padding-right: 20px;
 }
 
+div.CustomerTicketPrint {
+    grid-template-columns: minmax(0, 1fr);
+    max-width: 100%;
+    column-gap: unset;
+}
+
 div.TicketPrint > .Headline {
     display: flex;
     flex-direction: row;
     height: fit-content;
     align-items: end;
     grid-column: 1 / span 2;
+}
+
+div.CustomerTicketPrint > .Headline {
+    grid-column: 1;
 }
 
 div.TicketPrint div.Headline > h1 {
@@ -115,12 +125,21 @@ div.TicketPrint .WidgetSimple {
 }
 
 div.TicketPrint > .WidgetSimple {
+    position: relative;
     box-sizing: border-box;
     float: none;
 }
 
+div.CustomerTicketPrint > .WidgetSimple {
+    max-width: 100%;
+}
+
 div.TicketPrint #ArticleItems {
     grid-column: 1 / span 2;
+}
+
+div.TicketPrint.CustomerTicketPrint #ArticleItems {
+    grid-column: 1;
 }
 
 div.TicketPrint .WidgetSimple * {
@@ -131,6 +150,7 @@ div.TicketPrint .WidgetSimple * {
 
 div.TicketPrint .WidgetSimple .Content {
     padding: 4px;
+    overflow: hidden;
 }
 
 div.TicketPrint .WidgetSimple .Content .Warning,
@@ -207,17 +227,23 @@ div.TicketPrint #ArticleTableBody .Scroller{
     margin-bottom: 5px;
 }
 
-/*.TicketPrint #ArticleItems .Info > hr {
-    height: 0.5px ;
-    background-color: #cdcdd8;
-    background-color: var(--colBGMediumDark);
-    margin-left: 5px;
-    margin-right: 5px;
-    margin-bottom: 10px;
-}*/
+div.TicketPrint.CustomerTicketPrint .WidgetSimple .Content .FieldContainer {
+    position: relative;
+    display: flex;
+    flex-direction: row;
+}
+
+div.TicketPrint.CustomerTicketPrint .WidgetSimple .Content .FieldContainer > * {
+    line-height: 1.3em;
+    min-height: 17px;
+    padding-top: 0.3em;
+    padding-bottom: 1px;
+    text-wrap: wrap;
+}
 
 .TicketPrint .WidgetSimple .Content label,
 .TicketPrint #ArticleItems .ArticleMailHeader label {
+    width: 30%;
     font-weight: bold;
     color: #00023c;
     color: var(--colTextDark);
@@ -227,8 +253,21 @@ div.TicketPrint #ArticleTableBody .Scroller{
     width: 30%;
 }
 
+.TicketPrint.CustomerTicketPrint .WidgetSimple .Content label {
+    flex: 30%;
+    text-align: right;
+    text-shadow: 0 1px 0 var(--colBGLightMedium);
+}
+
 .TicketPrint .WidgetSimple .Content p.Value {
     margin-left: 30%;
+}
+
+.TicketPrint.CustomerTicketPrint .WidgetSimple .Content p.Value {
+    margin-left: 0;
+    flex: 70%;
+    padding-left: 8px;
+    padding-right: 0;
 }
 
 .TicketPrint #DynamicFieldsWidget .FieldContainer {

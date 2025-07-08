@@ -1,0 +1,156 @@
+# --
+# OTOBO is a web-based ticketing system for service organisations.
+# --
+# Copyright (C) 2001-2020 OTRS AG, https://otrs.com/
+# Copyright (C) 2019-2025 Rother OSS GmbH, https://otobo.io/
+# --
+# This program is free software: you can redistribute it and/or modify it under
+# the terms of the GNU General Public License as published by the Free Software
+# Foundation, either version 3 of the License, or (at your option) any later version.
+# This program is distributed in the hope that it will be useful, but WITHOUT
+# ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+# FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+# You should have received a copy of the GNU General Public License
+# along with this program. If not, see <https://www.gnu.org/licenses/>.
+# --
+## nofilter(TidyAll::Plugin::OTOBO::TT::ScriptUsage)
+<!DOCTYPE html>
+<html>
+
+    [% InsertTemplate("Copyright.tt") %]
+
+    <head>
+        <meta http-equiv="Content-type" content="text/html;charset=utf-8" />
+        <meta id="viewport" name="viewport" content="">
+        <meta name="robots" content="noindex,nofollow" />
+
+        [% InsertTemplate("AgentTicketPrint/PrintStyles.tt") %]
+
+
+    </head>
+    <body>
+        <div class="ARIARoleMain TicketPrint CustomerTicketPrint UseArticleColors">
+            <div class="Headline NoMargin">
+                <h1>
+                    [% Data.Hook %][% Config('Ticket::HookDivider') %][% Data.TicketNumber | html %] &mdash; <br />[% Data.Title | html %]
+                </h1>
+                <div id="PDFLogo">
+                    <img src="[% Data.PDFLogo | html %]">
+                </div>
+            </div>
+
+[% RenderBlockStart("InformationWidget") %]
+            <div class="WidgetSimple Expanded" id="[% Data.WidgetID | html %]">
+                <div class="Header">
+                    <h2>[% Translate(Data.WidgetTitle)  | html %]</h2>
+                </div>
+                <div class="Content">
+                    <div>
+                        <fieldset class="TableLike FixedLabelSmall Narrow">
+
+    [% RenderBlockStart("InformationWidgetField") %]
+                            <div class="FieldContainer">
+                                <label title="[% Data.Label | html %]">
+                                    [% Data.Label | html %]:
+                                </label>
+                                <p class="Value">
+                                    [% Data.Value | html %]
+                                </p>
+                            </div>
+    [% RenderBlockEnd("InformationWidgetField") %]
+
+                        </fieldset>
+
+    [% RenderBlockStart("DynamicFields") %]
+                        <fieldset>
+        [% RenderBlockStart("StandardField") %]
+                            <div class="FieldContainer DynamicFieldAutoResize">
+                                <label title="[% Data.Label | html %]">
+                                    [% Data.Label | html %]:
+                                </label>
+                                <p>
+                                    [% Data.Value %]
+                                </p>
+                            </div>
+        [% RenderBlockEnd("StandardField") %]
+        [% RenderBlockStart("SetField") %]
+                            <div class="SetDynamicField">
+            [% RenderBlockStart("DynamicFieldSetSeparator") %]
+                                <h2 class="FieldSetSeparator">[% Translate(Data.Name) | html %]</h2>
+            [% RenderBlockEnd("DynamicFieldSetSeparator") %]
+                                <div>
+            [% RenderBlockStart("SetDynamicField") %]
+                                    <div class="FieldContainer DynamicFieldAutoResize">
+                                        <label title="[% Data.Label | html %]">
+                                            [% Data.Label | html %]
+                                        </label>
+                                        <p>
+                [% RenderBlockStart("SetDynamicFieldValue") %]
+                                            [% Data.Value %]
+                [% RenderBlockEnd("SetDynamicFieldValue") %]
+                                        </p>
+                                    </div>
+            [% RenderBlockEnd("SetDynamicField") %]
+                                </div>
+                            </div>
+        [% RenderBlockEnd("SetField") %]
+                        </fieldset>
+    [% RenderBlockEnd("DynamicFields") %]
+                    </div>
+                </div>
+            </div>
+[% RenderBlockEnd("InformationWidget") %]
+
+[% RenderBlockStart("HintNoArticles") %]
+            <div class="WidgetSimple">
+                <div class="Content">
+                    [% Translate("This item has no articles yet.") | html %]
+                </div>
+            </div>
+[% RenderBlockEnd("HintNoArticles") %]
+
+[% RenderBlockStart("Articles") %]
+            <div id="ArticleItems">
+                [% Data.ArticleWidgetsHTML %]
+            </div>
+[% RenderBlockEnd("Articles") %]
+        
+        </div>
+
+        <script type="text/javascript">
+            //<![CDATA[
+                "use strict";
+
+                Core.Init.ExecuteInit('JS_LOADED');
+
+                Core.App.Ready(function () {
+
+                    Core.Init.ExecuteInit('DOCUMENT_READY');
+
+                    [% PROCESS JSDataInsert %]
+
+                    Core.Init.ExecuteInit('CONFIG_LOADED');
+                    Core.Init.ExecuteInit('APP_GLOBAL_EARLY');
+                    Core.Init.ExecuteInit('APP_GLOBAL');
+                    Core.Init.ExecuteInit('APP_GLOBAL_LATE');
+
+                });
+            //]]>
+        </script>
+
+        <script type="text/javascript">
+            //<![CDATA[
+                "use strict";
+                Core.App.Ready(function () {
+                    Core.Init.ExecuteInit('APP_MODULE_EARLY');
+
+                    [% PROCESS JSOnDocumentCompleteInsert %]
+
+                    Core.Init.ExecuteInit('APP_MODULE');
+                    Core.Init.ExecuteInit('APP_MODULE_LATE');
+                });
+            //]]>
+        </script>
+
+    </body>
+</html>
