@@ -48,7 +48,8 @@ sub new {
     # get needed objects
     my $ParamObject  = $Kernel::OM->Get('Kernel::System::Web::Request');
 
-    $Self->{ArticleSort}     = $ParamObject->GetParam( Param => 'ZoomExpandSort' ) || '';
+    $Self->{ArticleID}   = $ParamObject->GetParam( Param => 'ArticleID' ) || '';
+    $Self->{ArticleSort} = $ParamObject->GetParam( Param => 'ZoomExpandSort' ) || '';
 
     return $Self;
 }
@@ -263,6 +264,19 @@ sub _CreateHTMLContent {
         TicketID => $Ticket{TicketID},
         UserID   => $Self->{UserID},
     );
+
+    # show only specified article
+    if ( $Self->{ArticleID}) {
+        ARTICLE:
+        for my $Article (@ArticleBox) {
+            next ARTICLE if !$Article->{ArticleID};
+            next ARTICLE if $Self->{ArticleID} ne $Article->{ArticleID};
+
+            @ArticleBox = ($Article);
+
+            last ARTICLE;
+        }
+    }
 
     # age design
     $Ticket{Age} = $LayoutObject->CustomerAge(
