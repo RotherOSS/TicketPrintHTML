@@ -29,7 +29,28 @@
 [% END %]
             </h2>
         </div>
-
+        <div class="Info">
+            <div class="ArticleMailHeader">
+                <fieldset class="TableLike FixedLabelSmall">
+                    [% FOREACH ArticleField IN Data.ArticleMetaFields %]
+                        <!-- show accounted time and dynamic fields -->
+                        <label>[% Translate(ArticleField.value.Label) | html %]:</label>
+                        [% IF ArticleField.value.Link %]
+                            <p class="Value" title="[% ArticleField.value.Title %]">
+                                <a href="[% ArticleField.value.Link | Interpolate %]"
+                                    [% IF ArticleField.value.LinkPreview %] data-trigger="floater" data-floater-url="[% ArticleField.value.LinkPreview | Interpolate %]"[% END %]
+                                    target="_blank" class="DynamicFieldLink">
+                                        [% ArticleField.value.Value %]
+                                </a>
+                            </p>
+                        [% ELSE %]
+                            <p class="Value" title="[% ArticleField.value.Title %]">[% ArticleField.value.Value %]</p>
+                        [% END %]
+                    [% END %]
+                </fieldset>
+            </div>
+            <hr>
+        </div>
         <div class="Content">
             <template shadowrootmode="closed">
                 [% IF Data.HTML %]

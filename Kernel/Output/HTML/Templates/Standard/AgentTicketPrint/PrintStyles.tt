@@ -105,8 +105,7 @@ div.TicketPrint h2 * {
 }
 
 div.TicketPrint .WidgetSimple {
-    padding-top: 5px;
-    padding-left: 5px;
+    padding: 5px;
     border: 1px solid;
     border-color: #cdcdd8;
     border-color: var(--colBGMediumDark);
@@ -198,11 +197,34 @@ div.TicketPrint #ArticleTableBody .Scroller{
     margin-right: 0px;
 }
 
-.TicketPrint .WidgetSimple .Content label {
-    width: 30%;
+.TicketPrint #ArticleItems .ArticleMailHeader {
+    border-top: 0.5px solid;
+    border-bottom: 0.5px solid;
+    border-collapse: collapse;
+    border-color: #cdcdd8;
+    border-color: var(--colBGMediumDark);
+    margin-top: 5px;
+    margin-bottom: 5px;
+}
+
+/*.TicketPrint #ArticleItems .Info > hr {
+    height: 0.5px ;
+    background-color: #cdcdd8;
+    background-color: var(--colBGMediumDark);
+    margin-left: 5px;
+    margin-right: 5px;
+    margin-bottom: 10px;
+}*/
+
+.TicketPrint .WidgetSimple .Content label,
+.TicketPrint #ArticleItems .ArticleMailHeader label {
     font-weight: bold;
     color: #00023c;
     color: var(--colTextDark);
+}
+
+.TicketPrint .WidgetSimple .Content label {
+    width: 30%;
 }
 
 .TicketPrint .WidgetSimple .Content p.Value {
