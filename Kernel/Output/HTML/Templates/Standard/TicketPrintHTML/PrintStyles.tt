@@ -127,6 +127,8 @@ div.TicketPrint .oooWidget {
 
 div.TicketPrint .oooWidget {
     border-radius: 10px;
+    margin-right: 2px;
+    margin-left: 2px;
 }
 
 div.TicketPrint > .WidgetSimple {
@@ -155,7 +157,7 @@ div.TicketPrint .oooWidget * {
 }
 
 div.TicketPrint .oooWidget h3 {
-    padding: 4px 3px;
+    padding: 6px 8px;
     margin: 0;
     white-space: nowrap;
     font-size: 13px;
@@ -259,7 +261,7 @@ div.TicketPrint.CustomerTicketPrint .WidgetSimple .Content .FieldContainer > * {
 
 .TicketPrint .WidgetSimple .Content label,
 .TicketPrint #ArticleItems .ArticleMailHeader label,
-.TicketPrint .oooWidget p.ooo12 {
+.TicketPrint .oooWidget p.ooo12 span {
     width: 30%;
     font-weight: bold;
     color: #00023c;
@@ -268,11 +270,15 @@ div.TicketPrint.CustomerTicketPrint .WidgetSimple .Content .FieldContainer > * {
 
 .TicketPrint .oooWidget p.ooo12 {
     line-height: 1.3em;
-    text-align: right;
     min-height: 17px;
     padding-top: 0.3em;
     padding-bottom: 1px;
     text-wrap: wrap;
+    margin-left: 8px;
+}
+
+.TicketPrint #oooMore {
+    display: none;
 }
 
 .TicketPrint.CustomerTicketPrint .WidgetSimple .Content label {
