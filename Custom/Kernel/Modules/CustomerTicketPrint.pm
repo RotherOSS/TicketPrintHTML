@@ -231,7 +231,7 @@ sub _CreateHTMLContent {
         Space => ' '
     );
 
-    my $TicketInfoHTML = $DisplaySettings->{TicketInformation} ? $Self->_RenderTicketInfo( Ticket => \%Ticket ) : '';
+    my $TicketInfoHTML = $DisplaySettings->{TicketInformation} ? $Self->_RenderTicketInfo( %Ticket ) : '';
 
     # set display options
     $Param{Hook} = $ConfigObject->Get('Ticket::Hook') || 'Ticket#';
