@@ -114,7 +114,8 @@ div.TicketPrint h2 * {
     font-size: 13px;
 }
 
-div.TicketPrint .WidgetSimple {
+div.TicketPrint .WidgetSimple,
+div.TicketPrint .oooWidget {
     padding: 5px;
     border: 1px solid;
     border-color: #cdcdd8;
@@ -122,6 +123,10 @@ div.TicketPrint .WidgetSimple {
     box-shadow: none;
     margin-top: 15px;
     margin-bottom: 15px;
+}
+
+div.TicketPrint .oooWidget {
+    border-radius: 10px;
 }
 
 div.TicketPrint > .WidgetSimple {
@@ -142,10 +147,21 @@ div.TicketPrint.CustomerTicketPrint #ArticleItems {
     grid-column: 1;
 }
 
-div.TicketPrint .WidgetSimple * {
+div.TicketPrint .WidgetSimple *,
+div.TicketPrint .oooWidget * {
     font-size: 11px;
     line-height: 1.1em;
     flex-grow: 1;
+}
+
+div.TicketPrint .oooWidget h3 {
+    padding: 4px 3px;
+    margin: 0;
+    white-space: nowrap;
+    font-size: 13px;
+    font-weight: bold;
+    text-shadow: 1px 1px #fff;
+    color: var(--colTextDark);
 }
 
 div.TicketPrint .WidgetSimple .Content {
@@ -242,15 +258,21 @@ div.TicketPrint.CustomerTicketPrint .WidgetSimple .Content .FieldContainer > * {
 }
 
 .TicketPrint .WidgetSimple .Content label,
-.TicketPrint #ArticleItems .ArticleMailHeader label {
+.TicketPrint #ArticleItems .ArticleMailHeader label,
+.TicketPrint .oooWidget p.ooo12 {
     width: 30%;
     font-weight: bold;
     color: #00023c;
     color: var(--colTextDark);
 }
 
-.TicketPrint .WidgetSimple .Content label {
-    width: 30%;
+.TicketPrint .oooWidget p.ooo12 {
+    line-height: 1.3em;
+    text-align: right;
+    min-height: 17px;
+    padding-top: 0.3em;
+    padding-bottom: 1px;
+    text-wrap: wrap;
 }
 
 .TicketPrint.CustomerTicketPrint .WidgetSimple .Content label {
