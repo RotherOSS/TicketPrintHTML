@@ -638,8 +638,7 @@ sub _RenderTicketInfo {
     my $LayoutObject = $Kernel::OM->Get('Kernel::Output::HTML::Layout');
     my $ConfigObject = $Kernel::OM->Get('Kernel::Config');
 
-    # TODO: Provide a CustomerTicketPrint Config?
-    my $Config = $ConfigObject->Get("Ticket::Frontend::CustomerTicketZoom");
+    my $Config = $ConfigObject->Get("Ticket::Frontend::CustomerTicketPrint") // {};
 
     # ticket type
     if ( $ConfigObject->Get('Ticket::Type') && $Config->{AttributesView}->{Type} ) {

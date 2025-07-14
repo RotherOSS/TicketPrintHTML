@@ -50,4 +50,20 @@
             </Item>
         </Value>
     </Setting>
+    <Setting Name="Ticket::Frontend::CustomerTicketPrint###AttributesView" Required="1" Valid="1">
+        <Description Translatable="1">Shows the enabled ticket attributes in the customer interface (0 = Disabled and 1 = Enabled).</Description>
+        <Navigation>Frontend::Customer::View::TicketPrint</Navigation>
+        <Value>
+            <Hash>
+                <Item Key="Queue">1</Item>
+                <Item Key="Type">0</Item>
+                <Item Key="Priority">1</Item>
+                <Item Key="State">1</Item>
+                <Item Key="Service">0</Item>
+                <Item Key="SLA">0</Item>
+                <Item Key="Owner">0</Item>
+                <Item Key="Responsible">0</Item>
+            </Hash>
+        </Value>
+    </Setting>
 </otobo_config>
