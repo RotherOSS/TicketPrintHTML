@@ -171,6 +171,10 @@ div.TicketPrint .WidgetSimple .Content {
     overflow: hidden;
 }
 
+div.TicketPrint .WidgetSimple fieldset {
+    margin-bottom: 0;
+}
+
 div.TicketPrint .WidgetSimple .Content .Warning,
 div.TicketPrint .WidgetSimple .Content .Error,
 div.TicketPrint .WidgetSimple .Content .Notice,
@@ -207,6 +211,7 @@ div.TicketPrint #ArticleTableBody .Scroller{
     overflow-wrap: break-word;
     overflow: visible;
     white-space: normal;
+    border-bottom: none;
 }
 
 .TicketPrint div.Headline > h1 {
@@ -285,6 +290,12 @@ div.TicketPrint.CustomerTicketPrint .WidgetSimple .Content .FieldContainer > * {
     flex: 30%;
     text-align: right;
     text-shadow: 0 1px 0 var(--colBGLightMedium);
+}
+
+.TicketPrint #ArticleItems .ArticleMailHeader .TableLike p.Value {
+    width: 70%;
+    padding-left: 4px;
+    box-sizing: border-box;
 }
 
 .TicketPrint .WidgetSimple .Content p.Value {
