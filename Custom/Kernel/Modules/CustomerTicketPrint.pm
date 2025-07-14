@@ -316,7 +316,7 @@ sub _ArticleRender {
 
     my $LayoutObject      = $Kernel::OM->Get('Kernel::Output::HTML::Layout');
     my $ConfigObject      = $Kernel::OM->Get('Kernel::Config');
-    my $ArticleBaseObject = $Kernel::OM->Get('Kernel::Output::HTML::TicketZoom::Agent::Base');
+    my $ArticleBaseObject = $Kernel::OM->Get('Kernel::Output::HTML::TicketZoom::Customer::Base');
 
 # First part is based on Kernel::Output::HTML::TicketZoom::Agent::MIMEBase->ArticleRender()
 
@@ -339,10 +339,10 @@ sub _ArticleRender {
     my %ArticleFields = $LayoutObject->ArticleFields(%Param);
 
     # Get dynamic fields and accounted time
-    my %ArticleMetaFields = $ArticleBaseObject->ArticleMetaFields(%Param);
-
-    # Get data from modules like Google CVE search
-    my @ArticleModuleMeta = $ArticleBaseObject->_ArticleModuleMeta(%Param);
+    my %ArticleMetaFields = $ArticleBaseObject->ArticleMetaFields(
+        %Param,
+        DisplaySettingsSource => 'Ticket::Frontend::CustomerTicketPrint'
+    );
 
     # Show created by string, if creator is different from admin user.
     if ( $Article{CreateBy} > 1 ) {
@@ -571,8 +571,7 @@ sub _ArticleRender {
             SenderImage          => $SenderImage,
             SenderInitials       => $SenderInitials,
             HTML                 => $ArticleContent,
-            Styles               => $CombinedStyles,
-            ArticleModuleMeta    => \@ArticleModuleMeta
+            Styles               => $CombinedStyles
         },
     )
 }

@@ -292,6 +292,7 @@ sub _CreateHTMLContent {
             Ticket    => \%Ticket,
             AclAction => {},
             Config    => $Config,
+            DisplaySettingsSource => "Ticket::Frontend::AgentTicketPrint"
         );
 
         next WIDGET unless $WidgetOutput;
@@ -405,10 +406,10 @@ sub _ArticleRender {
     my %ArticleFields = $LayoutObject->ArticleFields(%Param);
 
     # Get dynamic fields and accounted time
-    my %ArticleMetaFields = $ArticleBaseObject->ArticleMetaFields(%Param);
-
-    # Get data from modules like Google CVE search
-    my @ArticleModuleMeta = $ArticleBaseObject->_ArticleModuleMeta(%Param);
+    my %ArticleMetaFields = $ArticleBaseObject->ArticleMetaFields(
+        %Param,
+        DisplaySettingsSource => 'Ticket::Frontend::AgentTicketPrint'
+    );
 
     # Show created by string, if creator is different from admin user.
     if ( $Article{CreateBy} > 1 ) {
@@ -637,8 +638,7 @@ sub _ArticleRender {
             SenderImage          => $SenderImage,
             SenderInitials       => $SenderInitials,
             HTML                 => $ArticleContent,
-            Styles               => $CombinedStyles,
-            ArticleModuleMeta    => \@ArticleModuleMeta
+            Styles               => $CombinedStyles
         },
     )
 }
