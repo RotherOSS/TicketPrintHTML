@@ -735,47 +735,7 @@ sub _RenderTicketInfo {
         );
     }
 
-    my $TicketObject = $Kernel::OM->Get('Kernel::System::Ticket');
-
-    # check if ticket is normal or process ticket
-    my $IsProcessTicket = $TicketObject->TicketCheckForProcessType(
-        'TicketID' => $Self->{TicketID},
-    );
-
-    # show process widget  and activity dialogs on process tickets
-    if ($IsProcessTicket) {
-
-        # get the DF where the ProcessEntityID is stored
-        my $ProcessEntityIDField = 'DynamicField_'
-            . $ConfigObject->Get("Process::DynamicFieldProcessManagementProcessID");
-
-        # get the DF where the AtivityEntityID is stored
-        my $ActivityEntityIDField = 'DynamicField_'
-            . $ConfigObject->Get("Process::DynamicFieldProcessManagementActivityID");
-
-        # create additional objects for process management
-        my $ActivityObject       = $Kernel::OM->Get('Kernel::System::ProcessManagement::Activity');
-        my $ActivityDialogObject = $Kernel::OM->Get('Kernel::System::ProcessManagement::ActivityDialog');
-        my $ProcessObject        = $Kernel::OM->Get('Kernel::System::ProcessManagement::Process');
-        my $ProcessData          = $ProcessObject->ProcessGet(
-            ProcessEntityID => $Param{$ProcessEntityIDField},
-        );
-
-        my $ActivityData = $ActivityObject->ActivityGet(
-            Interface        => 'CustomerInterface',
-            ActivityEntityID => $Param{$ActivityEntityIDField},
-        );
-
-        # output process information in the sidebar
-        $LayoutObject->Block(
-            Name => 'ProcessData',
-            Data => {
-                Process  => $ProcessData->{Name}  || '',
-                Activity => $ActivityData->{Name} || '',
-            },
-        );
-    }
-
+    my $TicketObject       = $Kernel::OM->Get('Kernel::System::Ticket');
     my $DynamicFieldObject = $Kernel::OM->Get('Kernel::System::DynamicField');
     my $BackendObject      = $Kernel::OM->Get('Kernel::System::DynamicField::Backend');
 
