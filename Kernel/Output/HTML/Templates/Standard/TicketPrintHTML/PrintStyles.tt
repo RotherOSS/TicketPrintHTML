@@ -231,7 +231,7 @@ div.TicketPrint #ArticleTableBody .Scroller{
 .TicketPrint .TicketList #ArticleTable thead:hover th,
 .TicketPrint .TicketList #ArticleTable tbody tr:hover td {
     background-color: white !important;
-    border: 0.5px solid gray !important;
+    border: 1px solid gray !important;
     border-collapse: collapse !important;
 }
 
@@ -241,8 +241,8 @@ div.TicketPrint #ArticleTableBody .Scroller{
 }
 
 .TicketPrint #ArticleItems .ArticleMailHeader {
-    border-top: 0.5px solid;
-    border-bottom: 0.5px solid;
+    border-top: 1px solid;
+    border-bottom: 1px solid;
     border-collapse: collapse;
     border-color: #cdcdd8;
     border-color: var(--colBGMediumDark);
@@ -265,12 +265,20 @@ div.TicketPrint.CustomerTicketPrint .WidgetSimple .Content .FieldContainer > * {
 }
 
 .TicketPrint .WidgetSimple .Content label,
-.TicketPrint #ArticleItems .ArticleMailHeader label,
-.TicketPrint .oooWidget p.ooo12 span {
-    width: 30%;
+.TicketPrint .oooWidget p.ooo12 span,
+.TicketPrint #ArticleItems .ArticleMailHeader label {
     font-weight: bold;
     color: #00023c;
     color: var(--colTextDark);
+}
+
+.TicketPrint .WidgetSimple .Content label,
+.TicketPrint .oooWidget p.ooo12 span {
+    width: 30%;
+}
+
+.TicketPrint #ArticleItems .ArticleMailHeader label {
+    width: 15%;
 }
 
 .TicketPrint .oooWidget p.ooo12 {
@@ -293,7 +301,7 @@ div.TicketPrint.CustomerTicketPrint .WidgetSimple .Content .FieldContainer > * {
 }
 
 .TicketPrint #ArticleItems .ArticleMailHeader .TableLike p.Value {
-    width: 70%;
+    width: 85%;
     padding-left: 4px;
     box-sizing: border-box;
 }
