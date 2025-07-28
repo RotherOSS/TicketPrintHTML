@@ -11,6 +11,9 @@
     <Filelist>
         <File Permission="660" Location="Custom/Kernel/Modules/AgentTicketPrint.pm" />
         <File Permission="660" Location="Custom/Kernel/Modules/CustomerTicketPrint.pm" />
+        <File Permission="660" Location="Custom/Kernel/Output/HTML/TicketZoom/Agent/Base.pm" />
+        <File Permission="660" Location="Custom/Kernel/Output/HTML/TicketZoom/Customer/Base.pm" />
+        <File Permission="660" Location="Custom/Kernel/Output/HTML/TicketZoom/TicketInformation.pm" />
         <File Permission="660" Location="Kernel/Config/Files/XML/TicketPrintHTML.xml" />
         <File Permission="660" Location="Kernel/Output/HTML/Templates/Standard/AgentTicketPrint.tt" />
         <File Permission="660" Location="Kernel/Output/HTML/Templates/Standard/TicketPrintHTML/MIMEBase.tt" />
