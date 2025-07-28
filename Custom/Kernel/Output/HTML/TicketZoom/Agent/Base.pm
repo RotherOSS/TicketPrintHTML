@@ -112,7 +112,7 @@ sub ArticleMetaFields {
 
     my %Result;
 # RotherOSS / TicketPrintHTML
-    my $DisplaySettingsSource = $Param{DisplaySettingsSource} || 'AgentTicketZoom';
+    my $DisplaySettingsSource = $Param{DisplaySettingsSource} || 'Ticket::Frontend::AgentTicketZoom';
 # EO TicketPrintHTML
 
     # show accounted article time
