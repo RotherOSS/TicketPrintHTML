@@ -689,7 +689,7 @@ sub _PrintPDF {
         return;
     }
 
-    my $CommandResult = `'$ChromePath' --no-sandbox --aggressive-cache-discard --headless --print-to-pdf='$PDFFilePath' --no-pdf-header-footer --virtual-time-budget=25000 '$HTMLFilePath' 2>&1`;
+    my $CommandResult = `'$ChromePath' --aggressive-cache-discard --headless --print-to-pdf='$PDFFilePath' --no-pdf-header-footer --virtual-time-budget=25000 '$HTMLFilePath' 2>&1`;
     $Kernel::OM->Get('Kernel::System::Log')->Log(
         Priority => 'debug',
         Message  => "Chrome PDF Print: " . $CommandResult,
