@@ -50,7 +50,7 @@ After that, please edit the file ``/opt/otobo-docker/docker-compose/otobo-base.y
      healthcheck:
        test: curl -s -f http://localhost:5000/robots.txt
 
-Following this, please restart the containers by executing ``docker-compose restart``.
+Following this, please restart the containers by executing ``docker-compose down``, followed by ``docker compose up -d``.
 
 System requirements
 -------------------
