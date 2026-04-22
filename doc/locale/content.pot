@@ -1,0 +1,186 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) 2019–2026 Rother OSS GmbH, https://otobo.io
+# This file is distributed under the same license as the OTOBO Documentation package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: OTOBO Documentation dev\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-04-22 13:54+0000\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: ../content/index.rst:1
+msgid "Contents"
+msgstr ""
+
+#: ../content/index.rst:6
+msgid "Overview"
+msgstr ""
+
+#: ../content/index.rst:11
+msgid "Summary"
+msgstr ""
+
+#: ../content/index.rst:14
+msgid "Print Tickets with advanced formatting, including images."
+msgstr ""
+
+#: ../content/index.rst:17
+msgid "Usage"
+msgstr ""
+
+#: ../content/index.rst:19
+msgid "Following installation, this package is active and usable right away."
+msgstr ""
+
+#: ../content/index.rst:21
+msgid "Tickets and their articles are now printed in their original styling. This especially includes content such as inline images."
+msgstr ""
+
+#: ../content/index.rst:23
+msgid "The logo to be printed at the top of the page can be specified with : :ref:`Ticket::Frontend::AgentTicketPrint###PrintLogoFile`"
+msgstr ""
+
+#: ../content/index.rst:25
+msgid "A complete list of options can be found in the :ref:`Ticket::Frontend::AgentTicketPrint###Configuration Reference`"
+msgstr ""
+
+#: ../content/index.rst:28
+msgid "Setup"
+msgstr ""
+
+#: ../content/index.rst:30
+msgid "For the print function to work properly, it is required that a headless Google Chrome browser is running."
+msgstr ""
+
+#: ../content/index.rst:32
+msgid "If running in docker, it is necessary for a file which the package includes to be in place. Please put the file ``scripts/docker-compose/seccomp_profile.json`` in the directory where the docker-compose file of the OTOBO installation is located, e.g. to ``/opt/otobo-docker/docker-compose/seccomp_profile.json``."
+msgstr ""
+
+#: ../content/index.rst:34
+msgid "After that, please edit the file ``/opt/otobo-docker/docker-compose/otobo-base.yml`` and insert the following two lines ( *without the plus signs* ), directly below the line ``command: web``:"
+msgstr ""
+
+#: ../content/index.rst:51
+msgid "Following this, please restart the containers by executing ``docker-compose down``, followed by ``docker compose up -d``."
+msgstr ""
+
+#: ../content/index.rst:54
+msgid "System requirements"
+msgstr ""
+
+#: ../content/index.rst:57
+msgid "Framework"
+msgstr ""
+
+#: ../content/index.rst:60
+msgid "OTOBO 11.0.x"
+msgstr ""
+
+#: ../content/index.rst:63
+msgid "Packages"
+msgstr ""
+
+#: ../content/index.rst:68
+#: ../content/index.rst:72
+msgid "\\-"
+msgstr ""
+
+#: ../content/index.rst:71
+msgid "Third-party software"
+msgstr ""
+
+#: ../content/index.rst:75
+msgid "Configuration Reference"
+msgstr ""
+
+#: ../content/index.rst:78
+msgid "Core::GoogleChrome"
+msgstr ""
+
+#: ../content/index.rst:81
+msgid "GoogleChrome::Bin"
+msgstr ""
+
+#: ../content/index.rst:82
+msgid "Defines the path to the Google Chrome or Chromium binary. If set, this binary will be used instead of PhantomJS::Bin."
+msgstr ""
+
+#: ../content/index.rst:85
+msgid "Frontend::Agent::View::TicketPrint"
+msgstr ""
+
+#: ../content/index.rst:88
+msgid "Ticket::Frontend::AgentTicketPrint###PrintLogoFile"
+msgstr ""
+
+#: ../content/index.rst:89
+msgid "Specifies the file for the logo in the page header encoded to base64 (700 x 100 pixel)."
+msgstr ""
+
+#: ../content/index.rst:92
+msgid "Ticket::Frontend::AgentTicketPrint###DynamicFieldWidgetDynamicFieldGroups"
+msgstr ""
+
+#: ../content/index.rst:93
+msgid "Dynamic fields groups for dynamic field widget. The key is the name of the group, the value contains the fields to be shown. Example: 'Key => My Group', 'Content: Name_X, NameY'."
+msgstr ""
+
+#: ../content/index.rst:96
+msgid "Ticket::Frontend::AgentTicketPrint###Widgets###0100-TicketInformation"
+msgstr ""
+
+#: ../content/index.rst:97
+msgid "Printing information usually visible in the Ticket Information Widget for the Zoom View sidebar."
+msgstr ""
+
+#: ../content/index.rst:100
+msgid "Ticket::Frontend::AgentTicketPrint###Widgets###0200-CustomerInformation"
+msgstr ""
+
+#: ../content/index.rst:101
+msgid "Printing information usually visible in the Customer Information Widget for the Zoom View sidebar."
+msgstr ""
+
+#: ../content/index.rst:104
+msgid "Ticket::Frontend::AgentTicketPrint###DynamicFieldWidgetDisplay"
+msgstr ""
+
+#: ../content/index.rst:105
+msgid "Display settings to override defaults for dynamic field widget for Tickets."
+msgstr ""
+
+#: ../content/index.rst:108
+msgid "About"
+msgstr ""
+
+#: ../content/index.rst:111
+msgid "Contact"
+msgstr ""
+
+#: ../content/index.rst:112
+msgid "Rother OSS GmbH"
+msgstr ""
+
+#: ../content/index.rst:113
+msgid "Email: hello@otobo.io"
+msgstr ""
+
+#: ../content/index.rst:114
+msgid "Web: https://otobo.io"
+msgstr ""
+
+#: ../content/index.rst:117
+msgid "Version"
+msgstr ""
+
+#: ../content/index.rst:118
+msgid "Author: |doc-vendor| / Version: |doc-version| / Date of release: |doc-datestamp|"
+msgstr ""
