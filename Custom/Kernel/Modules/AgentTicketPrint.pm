@@ -32,7 +32,7 @@ our $ObjectManagerDisabled = 1;
 # core modules
 
 # CPAN modules
-use PDF::API2 qw(open);
+use PDF::API2;
 
 # OTOBO modules
 use Kernel::System::VariableCheck qw(:all);
@@ -144,7 +144,7 @@ sub Run {
     # check if we got a result
     if (!$PDFFilePath) {
 
-        # error likely stems from chrome path not being configured and was logged earlier in this case
+        # error likely either stems from chrome path not being configured or the pdf being empty and was logged earlier in these cases
         return $LayoutObject->ErrorScreen(
             Message => Translatable('PDF cannot be generated!'),
             Comment => Translatable('Please contact the administrator and check the log file for more information.'),
@@ -157,6 +157,7 @@ sub Run {
             Priority => 'error',
             Message  => "PDF file '$PDFFilePath' does not exist!",
         );
+
         return $LayoutObject->ErrorScreen(
             Message => Translatable('PDF cannot be generated!'),
             Comment => Translatable('Please contact the administrator and check the log file for more information.'),
@@ -164,7 +165,21 @@ sub Run {
     }
 
     # return the document as string
-    my $PDF = PDF::API2->open($PDFFilePath);
+    my $PDF;
+    eval {
+        $PDF = PDF::API2->open($PDFFilePath);
+    };
+    if ( $@ ) {
+        $Kernel::OM->Get('Kernel::System::Log')->Log(
+            Priority => 'error',
+            Message  => "Error reading in the PDF, set MinimumLogLevel to Debug for more info: $@",
+        );
+
+        return $LayoutObject->ErrorScreen(
+            Message => Translatable('PDF cannot be generated!'),
+            Comment => Translatable('Please contact the administrator and check the log file for more information.'),
+        );
+    }
 
     my $PDFString = $PDF->stringify();
     $PDF->end();
@@ -696,6 +711,16 @@ sub _PrintPDF {
         Priority => 'debug',
         Message  => "Chrome PDF Print: " . $CommandResult,
     );
+
+    # check if the file is empty
+    if ( -z $PDFFilePath ) {
+        $Kernel::OM->Get('Kernel::System::Log')->Log(
+            Priority => 'error',
+            Message  => "Could not generate PDF via chrome: " . $CommandResult,
+        );
+
+        return;
+    }
 
     return $PDFFilePath;
 }
