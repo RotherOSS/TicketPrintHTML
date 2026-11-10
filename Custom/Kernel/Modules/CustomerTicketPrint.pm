@@ -16,12 +16,14 @@
 # along with this program. If not, see <https://www.gnu.org/licenses/>.
 # --
 
+# Rother OSS / TicketPrintHTML
+# Completely new implementation
+
 package Kernel::Modules::CustomerTicketPrint;
 
 use strict;
 use warnings;
 
-# Rother OSS / Complete new implementation
 use utf8;
 
 our $ObjectManagerDisabled = 1;
@@ -115,70 +117,79 @@ sub Run {
         Ticket => \%Ticket,
     );
 
-    my $HTMLFileDirectory = $FileTempObject->TempDir();
+        if ( $ConfigObject->Get('TicketPrint::Browser') eq 'HeadlessChrome' ) {
 
-    my ($FileHandle, $HTMLFilePath) = $FileTempObject->TempFile(
-        Suffix => '.html',
-    );
-    close($FileHandle);
+        my $HTMLFileDirectory = $FileTempObject->TempDir();
 
-    $MainObject->FileWrite(
-        Location    => $HTMLFilePath,
-        Content     => \$HTML,
-    );
-
-    my $PDFFilePath = $Self->_PrintPDF(
-        FileTempObject   => $FileTempObject,
-        HTMLFilePath     => $HTMLFilePath,
-    );
-
-    # check if we got a result
-    if (!$PDFFilePath) {
-
-        # error likely stems from chrome path not being configured and was logged earlier in this case
-        return $LayoutObject->ErrorScreen(
-            Message => Translatable('PDF cannot be generated!'),
-            Comment => Translatable('Please contact the administrator and check the log file for more information.'),
+        my ($FileHandle, $HTMLFilePath) = $FileTempObject->TempFile(
+            Suffix => '.html',
         );
-    }
+        close($FileHandle);
 
-    # check if file exists
-    if ( !-e $PDFFilePath ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
-            Priority => 'error',
-            Message  => "PDF file '$PDFFilePath' does not exist!",
+        $MainObject->FileWrite(
+            Location    => $HTMLFilePath,
+            Content     => \$HTML,
         );
-        return $LayoutObject->ErrorScreen(
-            Message => Translatable('PDF cannot be generated!'),
-            Comment => Translatable('Please contact the administrator and check the log file for more information.'),
+
+        my $PDFFilePath = $Self->_PrintPDF(
+            FileTempObject   => $FileTempObject,
+            HTMLFilePath     => $HTMLFilePath,
         );
+
+        # check if we got a result
+        if (!$PDFFilePath) {
+
+            # error likely stems from chrome path not being configured and was logged earlier in this case
+            return $LayoutObject->ErrorScreen(
+                Message => Translatable('PDF cannot be generated!'),
+                Comment => Translatable('Please contact the administrator and check the log file for more information.'),
+            );
+        }
+
+        # check if file exists
+        if ( !-e $PDFFilePath ) {
+            $Kernel::OM->Get('Kernel::System::Log')->Log(
+                Priority => 'error',
+                Message  => "PDF file '$PDFFilePath' does not exist!",
+            );
+
+            return $LayoutObject->ErrorScreen(
+                Message => Translatable('PDF cannot be generated!'),
+                Comment => Translatable('Please contact the administrator and check the log file for more information.'),
+            );
+        }
+
+        # return the document as string
+        my $PDF = PDF::API2->open($PDFFilePath);
+
+        my $PDFString = $PDF->stringify();
+        $PDF->end();
+
+        # assemble filename
+        if ( $Self->{UserTimeZone} ) {
+            $DateTimeObject->ToTimeZone( TimeZone => $Self->{UserTimeZone} );
+        }
+        my $Filename = 'Ticket_' . $Ticket{TicketNumber} . '_';
+        $Filename .= $DateTimeObject->Format( Format => '%Y-%m-%d_%H_%M' );
+        $Filename .= '.pdf';
+
+        my $CleanedFilename = $Kernel::OM->Get('Kernel::System::Main')->FilenameCleanUp(
+            Filename => $Filename,
+            Type     => 'Attachment',
+        );
+
+        return $LayoutObject->Attachment(
+            Filename    => $CleanedFilename,
+            ContentType => "application/pdf",
+            Content     => $PDFString,
+            Type        => 'inline',
+        );
+
+    } else {
+
+        return $HTML;
+
     }
-
-    # return the document as string
-    my $PDF = PDF::API2->open($PDFFilePath);
-
-    my $PDFString = $PDF->stringify();
-    $PDF->end();
-
-    # assemble filename
-    if ( $Self->{UserTimeZone} ) {
-        $DateTimeObject->ToTimeZone( TimeZone => $Self->{UserTimeZone} );
-    }
-    my $Filename = 'Ticket_' . $Ticket{TicketNumber} . '_';
-    $Filename .= $DateTimeObject->Format( Format => '%Y-%m-%d_%H_%M' );
-    $Filename .= '.pdf';
-
-    my $CleanedFilename = $Kernel::OM->Get('Kernel::System::Main')->FilenameCleanUp(
-        Filename => $Filename,
-        Type     => 'Attachment',
-    );
-
-    return $LayoutObject->Attachment(
-        Filename    => $CleanedFilename,
-        ContentType => "application/pdf",
-        Content     => $PDFString,
-        Type        => 'inline',
-    );
 }
 
 sub _CreateHTMLContent {

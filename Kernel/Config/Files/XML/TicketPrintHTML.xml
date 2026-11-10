@@ -1,12 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <otobo_config version="2.0" init="Application">
-    <Setting Name="GoogleChrome::Bin" Required="0" Valid="1">
-        <Description Translatable="1">Defines the path to the Google Chrome or Chromium binary. If set, this binary will be used instead of PhantomJS::Bin.</Description>
-        <Navigation>Core::GoogleChrome</Navigation>
-        <Value>
-            <Item ValueRegex="" ValueType="File">/usr/bin/chromium</Item>
-        </Value>
-    </Setting>
     <Setting Name="Ticket::Frontend::AgentTicketPrint###PrintLogoFile" Required="1" Valid="1">
         <Description Translatable="1">Specifies the file for the logo in the page header encoded to base64 (700 x 100 pixel).</Description>
         <Navigation>Frontend::Agent::View::TicketPrint</Navigation>
@@ -64,6 +57,16 @@
                 <Item Key="Owner">0</Item>
                 <Item Key="Responsible">0</Item>
             </Hash>
+        </Value>
+    </Setting>
+    <Setting Name="TicketPrint::Browser" Required="1" Valid="1">
+        <Description Translatable="1">Select the browser for rendering ticket print previews. For Headless Chrome to work, GoogleChrome::Bin must be configured.</Description>
+        <Navigation>Core::Ticket</Navigation>
+        <Value>
+            <Item ValueType="Select" SelectedID="ClientBrowser">
+                <Item ValueType="Option" Value="ClientBrowser" Translatable="1">Client Browser</Item>
+                <Item ValueType="Option" Value="HeadlessChrome" Translatable="1">Headless Chrome</Item>
+            </Item>
         </Value>
     </Setting>
 </otobo_config>
