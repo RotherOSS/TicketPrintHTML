@@ -28,7 +28,7 @@
 
         <title>[% Data.TitleArea | html %][% Config("ProductName") %]</title>
     </head>
-    <body>
+    <body onload="window.print();" onafterprint="window.close();">
 [% RenderBlockStart("Header") %]
         <div class="ARIARoleMain TicketPrint UseArticleColors">
             <div class="Headline NoMargin">
