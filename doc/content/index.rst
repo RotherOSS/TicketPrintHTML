@@ -21,7 +21,9 @@ Usage
 
 Following installation, this package is active and usable right away.
 
-Tickets and their articles are now printed in their original styling. This especially includes content such as inline images.
+Tickets and their articles are now printed in their original styling, including content such as inline images. 
+
+By default, the printing is handled by the client browser. It can be configured to use a headless Chrome browser on the server side instead. The necessary configuration steps are explained in the :ref:`Setup` section below.
 
 The logo to be printed at the top of the page can be specified with : :ref:`Ticket::Frontend::AgentTicketPrint###PrintLogoFile`
 
@@ -30,9 +32,11 @@ A complete list of options can be found in the :ref:`Ticket::Frontend::AgentTick
 Setup
 -----
 
-For the print function to work properly, it is required that a headless Google Chrome browser is running.
+No further configuration is required for the package to work. However, if you want to use the server side printing feature, please follow the steps below.
 
-If running in docker, it is necessary for a file which the package includes to be in place. Please put the file ``scripts/docker-compose/seccomp_profile.json`` in the directory where the docker-compose file of the OTOBO installation is located, e.g. to ``/opt/otobo-docker/docker-compose/seccomp_profile.json``.
+For server side printing with HTML styles and images, it is required that a headless Google Chrome browser is running on the server.
+
+In in docker, it is necessary to change the container's security configuration. For this purpose, a modified seccomp profile is required. A version with the additional permissions is part of the package download, but regular updating to current docker versions is required. Please put the file ``scripts/docker-compose/seccomp_profile.json`` in the directory where the docker-compose file of the OTOBO installation is located, e.g. to ``/opt/otobo-docker/docker-compose/seccomp_profile.json``.
 
 After that, please edit the file ``/opt/otobo-docker/docker-compose/otobo-base.yml`` and insert the following two lines ( *without the plus signs* ), directly below the line ``command: web``:
 
