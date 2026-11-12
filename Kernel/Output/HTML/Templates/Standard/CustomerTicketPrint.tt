@@ -26,7 +26,7 @@
 
         [% InsertTemplate("TicketPrintHTML/PrintStyles.tt") %]
 
-        <title>[% Data.TitleArea | html %][% Config("ProductName") %]</title>
+        <title>Ticket_[% Data.TicketNumber | html %]</title>
     </head>
     <body onload="window.print();" onafterprint="window.close();">
 [% RenderBlockStart("Header") %]
