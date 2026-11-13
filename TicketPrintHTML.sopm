@@ -6,8 +6,9 @@
     <Vendor>Rother OSS GmbH</Vendor>
     <URL>https://otobo.io/</URL>
     <License>GNU GENERAL PUBLIC LICENSE Version 3, 29 June 2007</License>
-    <Description Lang="en">Print Tickets with advanced formatting, including images.</Description>
+    <Description Lang="en">Print tickets with advanced formatting, including images.</Description>
     <Description Lang="de">Ticket Druck mit verbesserter Formatierung inklusive Bildern.</Description>
+    <Description Lang="hu">Jegyek nyomtatása speciális formázással, képekkel együtt.</Description>
     <Filelist>
         <File Permission="660" Location="Custom/Kernel/Modules/AgentTicketPrint.pm" />
         <File Permission="660" Location="Custom/Kernel/Modules/CustomerTicketPrint.pm" />
